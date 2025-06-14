@@ -16,7 +16,7 @@ const ThemeToggle = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-transparent border-gray-600">
+        <Button variant="outline" size="icon">
           {effectiveTheme === 'dark' ? (
             <Moon className="h-4 w-4" />
           ) : (
@@ -25,25 +25,16 @@ const ThemeToggle = () => {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
-        <DropdownMenuItem 
-          onClick={() => setTheme('light')}
-          className="text-white hover:bg-gray-700"
-        >
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme('light')}>
           <Sun className="mr-2 h-4 w-4" />
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setTheme('dark')}
-          className="text-white hover:bg-gray-700"
-        >
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
           <Moon className="mr-2 h-4 w-4" />
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setTheme('auto')}
-          className="text-white hover:bg-gray-700"
-        >
+        <DropdownMenuItem onClick={() => setTheme('auto')}>
           <Sun className="mr-2 h-4 w-4" />
           Auto
         </DropdownMenuItem>

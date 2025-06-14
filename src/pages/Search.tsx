@@ -47,14 +47,14 @@ const Search = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-black shadow-sm border-b border-gray-800">
+      <header className="bg-background shadow-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <MapPin className="h-6 w-6 text-green-500" />
-              <h1 className="text-xl font-bold text-white">Parkiko</h1>
+              <h1 className="text-xl font-bold text-foreground">Parkiko</h1>
             </div>
             <div className="flex items-center space-x-4">
               <ThemeToggle />
@@ -66,51 +66,51 @@ const Search = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Filters */}
-        <Card className="mb-8 bg-gray-800 border-gray-700">
+        <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
+            <CardTitle className="flex items-center gap-2">
               <SearchIcon className="h-5 w-5" />
               Find Parking Spaces
             </CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardDescription>
               Search for available parking spaces in your desired location
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">Location</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Location</label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Enter location"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    className="pl-10"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">Date</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Date</label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    className="pl-10"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">Time</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Time</label>
                 <div className="relative">
-                  <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    className="pl-10"
                   />
                 </div>
               </div>
@@ -127,21 +127,21 @@ const Search = () => {
         {/* Results */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-white">Available Parking Spaces</h2>
+            <h2 className="text-2xl font-bold text-foreground">Available Parking Spaces</h2>
             {parkingSpaces.map((space) => (
-              <Card key={space.id} className={`bg-gray-800 border-gray-700 ${!space.available ? 'opacity-60' : ''}`}>
+              <Card key={space.id} className={!space.available ? 'opacity-60' : ''}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="text-lg text-white">{space.name}</CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1 text-gray-300">
+                      <CardTitle className="text-lg">{space.name}</CardTitle>
+                      <CardDescription className="flex items-center gap-1 mt-1">
                         <MapPin className="h-4 w-4" />
                         {space.location} • {space.distance}
                       </CardDescription>
                     </div>
                     <div className="text-right">
                       <div className="text-xl font-bold text-green-500">{space.price}</div>
-                      <div className="text-sm text-gray-400">★ {space.rating}</div>
+                      <div className="text-sm text-muted-foreground">★ {space.rating}</div>
                     </div>
                   </div>
                 </CardHeader>
@@ -170,12 +170,12 @@ const Search = () => {
 
           {/* Map Placeholder */}
           <div className="lg:sticky lg:top-8">
-            <Card className="h-96 bg-gray-800 border-gray-700">
+            <Card className="h-96">
               <CardContent className="p-0 h-full">
-                <div className="bg-gray-700 h-full rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-400">
+                <div className="bg-muted h-full rounded-lg flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
                     <MapPin className="h-12 w-12 mx-auto mb-2 text-green-500" />
-                    <p className="text-white">Interactive Map</p>
+                    <p className="text-foreground">Interactive Map</p>
                     <p className="text-sm">Parking locations will be displayed here</p>
                   </div>
                 </div>
