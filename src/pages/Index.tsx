@@ -4,10 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Search, Calendar, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
+  const { isSignedIn, setShowSignInModal } = useAuth();
+  const navigate = useNavigate();
+
+  const handleFindParking = () => {
+    if (isSignedIn) {
+      navigate("/search");
+    } else {
+      setShowSignInModal(true);
+    }
+  };
+
+  const handleListSpace = () => {
+    if (isSignedIn) {
+      navigate("/list-space");
+    } else {
+      setShowSignInModal(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -19,8 +38,18 @@ const Index = () => {
             <h1 className="text-2xl font-bold text-gray-900">ParkSmart</h1>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/search" className="text-gray-600 hover:text-blue-600 transition-colors">Find Parking</Link>
-            <Link to="/list-space" className="text-gray-600 hover:text-blue-600 transition-colors">List Your Space</Link>
+            <button 
+              onClick={handleFindParking}
+              className="text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Find Parking
+            </button>
+            <button 
+              onClick={handleListSpace}
+              className="text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              List Your Space
+            </button>
             <Link to="/about" className="text-gray-600 hover:text-blue-600 transition-colors">About</Link>
             <Button variant="outline" asChild>
               <Link to="/login">Sign In</Link>
@@ -55,11 +84,9 @@ const Index = () => {
                   className="pl-10"
                 />
               </div>
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
-                <Link to="/search">
-                  <Search className="mr-2 h-5 w-5" />
-                  Search Parking
-                </Link>
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleFindParking}>
+                <Search className="mr-2 h-5 w-5" />
+                Search Parking
               </Button>
             </div>
           </div>
@@ -118,11 +145,11 @@ const Index = () => {
           <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
           <p className="text-xl mb-8">Join thousands of drivers and parking space owners in Kerala</p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/search">Find Parking Now</Link>
+            <Button size="lg" variant="secondary" onClick={handleFindParking}>
+              Find Parking Now
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600" asChild>
-              <Link to="/list-space">List Your Space</Link>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600" onClick={handleListSpace}>
+              List Your Space
             </Button>
           </div>
         </div>
