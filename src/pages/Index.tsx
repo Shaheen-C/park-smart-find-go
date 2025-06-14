@@ -142,8 +142,17 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-black text-white py-16">
-        <div className="container mx-auto px-4 text-center">
+      <section 
+        className="bg-black text-white py-16 relative"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-65"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
           <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
           <p className="text-xl mb-8">Join thousands of drivers and parking space owners in Kerala</p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
