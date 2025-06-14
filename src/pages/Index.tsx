@@ -72,7 +72,7 @@ const Index = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="absolute inset-0 bg-black opacity-25"></div>
+        <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <h2 className="text-5xl font-bold text-foreground mb-6">
             Find & Book Parking Spaces Instantly
