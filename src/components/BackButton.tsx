@@ -7,7 +7,13 @@ const BackButton = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate(-1);
+    // Check if there's a previous page in the history
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      // If no previous page, go to home
+      navigate('/');
+    }
   };
 
   return (
