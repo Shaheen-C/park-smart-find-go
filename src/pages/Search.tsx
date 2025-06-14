@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Search as SearchIcon, Calendar, Clock } from "lucide-react";
 import BackButton from "@/components/BackButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Search = () => {
   const [location, setLocation] = useState("");
@@ -55,7 +56,10 @@ const Search = () => {
               <MapPin className="h-6 w-6 text-green-500" />
               <h1 className="text-xl font-bold text-white">Parkiko</h1>
             </div>
-            <BackButton />
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <BackButton />
+            </div>
           </div>
         </div>
       </header>

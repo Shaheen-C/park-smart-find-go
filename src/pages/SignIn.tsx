@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, User, Building2, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const SignIn = () => {
   const [driverEmail, setDriverEmail] = useState("");
@@ -38,7 +39,10 @@ const SignIn = () => {
               <MapPin className="h-6 w-6 text-green-500" />
               <h1 className="text-xl font-bold text-white">Parkiko</h1>
             </div>
-            <BackButton />
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <BackButton />
+            </div>
           </div>
         </div>
       </header>

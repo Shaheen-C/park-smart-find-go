@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, Search, Calendar, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
@@ -51,6 +52,7 @@ const Index = () => {
               List Your Space
             </button>
             <Link to="/about" className="text-gray-300 hover:text-green-500 transition-colors">About</Link>
+            <ThemeToggle />
             <Button variant="outline" asChild>
               <Link to="/login">Sign In</Link>
             </Button>
