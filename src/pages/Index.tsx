@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/30 border-b border-border/30">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/30 border-b border-border/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <MapPin className="h-8 w-8 text-green-500" />
@@ -73,7 +72,7 @@ const Index = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="absolute inset-0 bg-background opacity-85"></div>
+        <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <h2 className="text-5xl font-bold text-foreground mb-6">
             Find & Book Parking Spaces Instantly
