@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MapPin, User, Building2, Eye, EyeOff, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Register = () => {
   // Driver form state
@@ -67,25 +67,28 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/30 border-b border-border/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+              <MapPin className="h-6 w-6 text-green-500" />
+              <h1 className="text-xl font-bold text-foreground">Parkiko</h1>
             </div>
-            <BackButton />
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <BackButton />
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Join ParkSmart</h2>
-            <p className="text-gray-600">Create your account to get started</p>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Join Parkiko</h2>
+            <p className="text-muted-foreground">Create your account to get started</p>
           </div>
 
           <Card>
@@ -155,7 +158,7 @@ const Register = () => {
                         Phone Number
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="driver-phone"
                           type="tel"
@@ -183,7 +186,7 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowDriverPassword(!showDriverPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                         >
                           {showDriverPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -205,7 +208,7 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowDriverConfirmPassword(!showDriverConfirmPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                         >
                           {showDriverConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -217,20 +220,20 @@ const Register = () => {
                         checked={driverForm.agreeToTerms}
                         onCheckedChange={(checked) => updateDriverForm("agreeToTerms", !!checked)}
                       />
-                      <label htmlFor="driver-terms" className="text-sm text-gray-600">
+                      <label htmlFor="driver-terms" className="text-sm text-muted-foreground">
                         I agree to the{" "}
-                        <Link to="/terms" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/terms" className="text-green-600 hover:text-green-700">
                           Terms of Service
                         </Link>{" "}
                         and{" "}
-                        <Link to="/privacy" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/privacy" className="text-green-600 hover:text-green-700">
                           Privacy Policy
                         </Link>
                       </label>
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full" 
+                      className="w-full bg-green-600 hover:bg-green-700" 
                       disabled={!driverForm.agreeToTerms}
                     >
                       Create Driver Account
@@ -299,7 +302,7 @@ const Register = () => {
                         Phone Number
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="owner-phone"
                           type="tel"
@@ -327,7 +330,7 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowOwnerPassword(!showOwnerPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                         >
                           {showOwnerPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -349,7 +352,7 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowOwnerConfirmPassword(!showOwnerConfirmPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                         >
                           {showOwnerConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -361,20 +364,20 @@ const Register = () => {
                         checked={ownerForm.agreeToTerms}
                         onCheckedChange={(checked) => updateOwnerForm("agreeToTerms", !!checked)}
                       />
-                      <label htmlFor="owner-terms" className="text-sm text-gray-600">
+                      <label htmlFor="owner-terms" className="text-sm text-muted-foreground">
                         I agree to the{" "}
-                        <Link to="/terms" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/terms" className="text-green-600 hover:text-green-700">
                           Terms of Service
                         </Link>{" "}
                         and{" "}
-                        <Link to="/privacy" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/privacy" className="text-green-600 hover:text-green-700">
                           Privacy Policy
                         </Link>
                       </label>
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full" 
+                      className="w-full bg-green-600 hover:bg-green-700" 
                       disabled={!ownerForm.agreeToTerms}
                     >
                       Create Owner Account
@@ -384,9 +387,9 @@ const Register = () => {
               </Tabs>
 
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+                  <Link to="/login" className="text-green-600 hover:text-green-700 font-medium">
                     Sign in here
                   </Link>
                 </p>
