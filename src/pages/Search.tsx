@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Search as SearchIcon, Calendar, Clock } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 const Search = () => {
   const [location, setLocation] = useState("");
@@ -49,9 +50,12 @@ const Search = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-6 w-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-6 w-6 text-blue-600" />
+              <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+            </div>
+            <BackButton />
           </div>
         </div>
       </header>

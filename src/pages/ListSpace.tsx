@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { MapPin, Upload, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
+import BackButton from "@/components/BackButton";
 
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -51,10 +52,13 @@ const ListSpace = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-6 w-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
-            <span className="text-gray-500">• List Your Space</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-6 w-6 text-blue-600" />
+              <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+              <span className="text-gray-500">• List Your Space</span>
+            </div>
+            <BackButton />
           </div>
         </div>
       </header>
