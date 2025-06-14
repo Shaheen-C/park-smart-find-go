@@ -142,15 +142,15 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-foreground text-background py-16">
+      <section className="bg-black text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Ready to Get Started?</h3>
           <p className="text-xl mb-8">Join thousands of drivers and parking space owners in Kerala</p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" onClick={handleFindParking}>
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white" onClick={handleFindParking}>
               Find Parking Now
             </Button>
-            <Button size="lg" variant="outline" className="border-background text-background hover:bg-background hover:text-foreground" onClick={handleListSpace}>
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white border-green-600" onClick={handleListSpace}>
               List Your Space
             </Button>
           </div>
