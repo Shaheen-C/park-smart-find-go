@@ -29,14 +29,14 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-black shadow-sm border-b border-gray-800">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+              <MapPin className="h-6 w-6 text-green-500" />
+              <h1 className="text-xl font-bold text-white">Parkiko</h1>
             </div>
             <BackButton />
           </div>
@@ -46,23 +46,23 @@ const SignIn = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your ParkSmart account</p>
+            <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+            <p className="text-gray-300">Sign in to your Parkiko account</p>
           </div>
 
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle>Sign In</CardTitle>
-              <CardDescription>Choose your account type to continue</CardDescription>
+              <CardTitle className="text-white">Sign In</CardTitle>
+              <CardDescription className="text-gray-300">Choose your account type to continue</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="driver" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="driver" className="flex items-center gap-2">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-700">
+                  <TabsTrigger value="driver" className="flex items-center gap-2 data-[state=active]:bg-green-600">
                     <User className="h-4 w-4" />
                     Driver
                   </TabsTrigger>
-                  <TabsTrigger value="owner" className="flex items-center gap-2">
+                  <TabsTrigger value="owner" className="flex items-center gap-2 data-[state=active]:bg-green-600">
                     <Building2 className="h-4 w-4" />
                     Owner
                   </TabsTrigger>
@@ -72,7 +72,7 @@ const SignIn = () => {
                 <TabsContent value="driver">
                   <form onSubmit={handleDriverSignIn} className="space-y-4">
                     <div>
-                      <label htmlFor="driver-email" className="block text-sm font-medium mb-2">
+                      <label htmlFor="driver-email" className="block text-sm font-medium mb-2 text-white">
                         Email Address
                       </label>
                       <Input
@@ -81,11 +81,12 @@ const SignIn = () => {
                         placeholder="Enter your email"
                         value={driverEmail}
                         onChange={(e) => setDriverEmail(e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                         required
                       />
                     </div>
                     <div>
-                      <label htmlFor="driver-password" className="block text-sm font-medium mb-2">
+                      <label htmlFor="driver-password" className="block text-sm font-medium mb-2 text-white">
                         Password
                       </label>
                       <div className="relative">
@@ -95,18 +96,19 @@ const SignIn = () => {
                           placeholder="Enter your password"
                           value={driverPassword}
                           onChange={(e) => setDriverPassword(e.target.value)}
+                          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                           required
                         />
                         <button
                           type="button"
                           onClick={() => setShowDriverPassword(!showDriverPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
                         >
                           {showDriverPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
                     </div>
-                    <Button type="submit" className="w-full">
+                    <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
                       Sign In as Driver
                     </Button>
                   </form>
@@ -116,7 +118,7 @@ const SignIn = () => {
                 <TabsContent value="owner">
                   <form onSubmit={handleOwnerSignIn} className="space-y-4">
                     <div>
-                      <label htmlFor="owner-email" className="block text-sm font-medium mb-2">
+                      <label htmlFor="owner-email" className="block text-sm font-medium mb-2 text-white">
                         Email Address
                       </label>
                       <Input
@@ -125,11 +127,12 @@ const SignIn = () => {
                         placeholder="Enter your email"
                         value={ownerEmail}
                         onChange={(e) => setOwnerEmail(e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                         required
                       />
                     </div>
                     <div>
-                      <label htmlFor="owner-password" className="block text-sm font-medium mb-2">
+                      <label htmlFor="owner-password" className="block text-sm font-medium mb-2 text-white">
                         Password
                       </label>
                       <div className="relative">
@@ -139,18 +142,19 @@ const SignIn = () => {
                           placeholder="Enter your password"
                           value={ownerPassword}
                           onChange={(e) => setOwnerPassword(e.target.value)}
+                          className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                           required
                         />
                         <button
                           type="button"
                           onClick={() => setShowOwnerPassword(!showOwnerPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
                         >
                           {showOwnerPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
                     </div>
-                    <Button type="submit" className="w-full">
+                    <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
                       Sign In as Owner
                     </Button>
                   </form>
@@ -158,13 +162,13 @@ const SignIn = () => {
               </Tabs>
 
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                   Don't have an account?{" "}
-                  <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                  <Link to="/register" className="text-green-500 hover:text-green-400 font-medium">
                     Sign up here
                   </Link>
                 </p>
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 block mt-2">
+                <Link to="/forgot-password" className="text-sm text-green-500 hover:text-green-400 block mt-2">
                   Forgot your password?
                 </Link>
               </div>
