@@ -29,9 +29,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('theme', theme);
     
+    // Apply the correct theme class
     if (effectiveTheme === 'dark') {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('dark-theme');
     } else {
+      document.documentElement.classList.remove('dark-theme');
       document.documentElement.classList.add('dark');
     }
   }, [theme, effectiveTheme]);
@@ -43,7 +46,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const newAutoTheme = getAutoTheme();
         if (newAutoTheme === 'dark') {
           document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('dark-theme');
         } else {
+          document.documentElement.classList.remove('dark-theme');
           document.documentElement.classList.add('dark');
         }
       }, 60000); // Check every minute
