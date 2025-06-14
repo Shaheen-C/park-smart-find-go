@@ -32,7 +32,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background shadow-sm border-b border-border">
+      <header className="absolute top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/30 border-b border-border/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <MapPin className="h-8 w-8 text-green-500" />
@@ -65,7 +65,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section 
-        className="container mx-auto px-4 py-16 text-center relative"
+        className="min-h-screen px-4 py-16 text-center relative flex items-center justify-center"
         style={{
           backgroundImage: `url('https://images.pexels.com/photos/2220292/pexels-photo-2220292.jpeg')`,
           backgroundSize: 'cover',
