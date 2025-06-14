@@ -29,7 +29,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+    <div className="min-h-screen bg-black">
       {/* Header */}
       <header className="bg-black shadow-sm border-b border-gray-800">
         <div className="container mx-auto px-4 py-4">
