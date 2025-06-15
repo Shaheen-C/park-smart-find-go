@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search as SearchIcon, Calendar, Clock } from "lucide-react";
+import { Search as SearchIcon, Calendar, Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
