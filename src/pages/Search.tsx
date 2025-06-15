@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,10 +54,7 @@ const Search = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-center flex-1">
               <Link to="/" className="flex flex-col items-center space-y-1 hover:opacity-80 transition-opacity">
-                <div className="flex items-center space-x-2">
-                  <img src="/lovable-uploads/83d99fd1-b1f1-4e81-9074-0bf97e3e0c41.png" alt="Parkiko Logo" className="h-6 w-6" />
-                  <h1 className="text-xl font-bold text-green-500">Parkiko</h1>
-                </div>
+                <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-8 w-auto" />
                 <p className="text-xs text-white/70 font-medium">Park Smart, Park Easy</p>
               </Link>
             </div>
