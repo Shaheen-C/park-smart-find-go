@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Fuel, Navigation, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Facility {
   place_id: string;
   name: string;
   vicinity: string;
   types: string[];
-  rating?: number;
   opening_hours?: {
     open_now: boolean;
   };
@@ -22,6 +22,7 @@ interface Facility {
     };
   };
   distance?: number;
+  phone?: string;
 }
 
 interface NearbyFacilitiesProps {
@@ -65,9 +66,15 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
         setLoading(false);
         toast({
           title: "Location error",
-          description: "Unable to get your current location.",
+          description: "Unable to get your current location. Please enable location services.",
           variant: "destructive"
         });
+        console.error("Geolocation error:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
       }
     );
   };
@@ -75,45 +82,39 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
   const searchNearbyFacilities = async (location: { lat: number; lng: number }, type: string) => {
     setLoading(true);
     try {
-      // This would call your Supabase Edge Function
-      // For now, showing sample data structure
+      console.log("Searching for facilities:", { location, type });
       
-      // Sample data - replace with actual API call
-      const sampleFacilities: Facility[] = [
-        {
-          place_id: "sample1",
-          name: "Indian Oil Petrol Station",
-          vicinity: "MG Road, Kochi",
-          types: ["gas_station"],
-          rating: 4.2,
-          opening_hours: { open_now: true },
-          geometry: { location: { lat: location.lat + 0.01, lng: location.lng + 0.01 } },
-          distance: 1.2
-        },
-        {
-          place_id: "sample2", 
-          name: "HP Petrol Pump",
-          vicinity: "Marine Drive, Kochi",
-          types: ["gas_station"],
-          rating: 4.0,
-          opening_hours: { open_now: true },
-          geometry: { location: { lat: location.lat - 0.01, lng: location.lng - 0.01 } },
-          distance: 1.8
+      const { data, error } = await supabase.functions.invoke('nearby-facilities', {
+        body: {
+          lat: location.lat,
+          lng: location.lng,
+          type: type,
+          radius: 5000 // 5km radius
         }
-      ];
+      });
 
-      setFacilities(sampleFacilities);
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw error;
+      }
+
+      console.log("Received facilities:", data);
+      
+      const facilitiesData = data?.facilities || [];
+      setFacilities(facilitiesData);
+      
       toast({
         title: "Facilities found",
-        description: `Found ${sampleFacilities.length} nearby ${facilityTypes.find(f => f.key === type)?.label.toLowerCase()}`
+        description: `Found ${facilitiesData.length} nearby ${facilityTypes.find(f => f.key === type)?.label.toLowerCase()}`
       });
     } catch (error) {
       console.error("Error searching facilities:", error);
       toast({
         title: "Search failed",
-        description: "Unable to search for nearby facilities.",
+        description: "Unable to search for nearby facilities. Please try again.",
         variant: "destructive"
       });
+      setFacilities([]);
     } finally {
       setLoading(false);
     }
@@ -146,7 +147,7 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
           Nearby Facilities
         </CardTitle>
         <CardDescription>
-          Find petrol pumps, toilets, and rest areas near you
+          Find petrol pumps, toilets, and rest areas near you using OpenStreetMap data
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -159,7 +160,7 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
               className="w-full"
             >
               <Navigation className="mr-2 h-4 w-4" />
-              Get My Location
+              {loading ? "Getting Location..." : "Get My Location"}
             </Button>
           )}
 
@@ -206,19 +207,19 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
                       <h4 className="font-medium text-sm">{facility.name}</h4>
                       <p className="text-xs text-muted-foreground">{facility.vicinity}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        {facility.rating && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                            ⭐ {facility.rating}
-                          </span>
-                        )}
                         {facility.distance && (
                           <span className="text-xs text-muted-foreground">
-                            {facility.distance} km away
+                            {facility.distance.toFixed(1)} km away
                           </span>
                         )}
                         {facility.opening_hours?.open_now && (
                           <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                             Open Now
+                          </span>
+                        )}
+                        {facility.phone && (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            📞 {facility.phone}
                           </span>
                         )}
                       </div>
@@ -228,6 +229,7 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
                       variant="outline"
                       onClick={() => openInMaps(facility)}
                       className="ml-2"
+                      title="Open in Google Maps"
                     >
                       <Navigation className="h-3 w-3" />
                     </Button>
@@ -240,7 +242,8 @@ const NearbyFacilities = ({ userLocation, onLocationUpdate }: NearbyFacilitiesPr
           {/* No Results */}
           {!loading && facilities.length === 0 && userLocation && (
             <div className="text-center py-4">
-              <p className="text-muted-foreground">No facilities found nearby</p>
+              <p className="text-muted-foreground">No {facilityTypes.find(f => f.key === activeType)?.label.toLowerCase()} found nearby</p>
+              <p className="text-xs text-muted-foreground mt-1">Try expanding your search radius or check a different facility type</p>
             </div>
           )}
         </div>
