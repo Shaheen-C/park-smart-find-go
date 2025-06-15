@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +42,7 @@ export const useListingActions = () => {
     try {
       console.log("Starting delete operation for space:", id, "user:", user.id);
       
-      // First, check if there are any active (non-cancelled) reservations for this parking space
+      // Check if there are any active (non-cancelled) reservations for this parking space
       const { data: reservations, error: reservationsError } = await supabase
         .from("parking_reservations")
         .select("id")
@@ -65,20 +64,7 @@ export const useListingActions = () => {
         return;
       }
 
-      // Delete any cancelled reservations first to avoid foreign key constraint issues
-      console.log("Deleting cancelled reservations for space:", id);
-      const { error: deleteCancelledError } = await supabase
-        .from("parking_reservations")
-        .delete()
-        .eq("parking_space_id", id)
-        .eq("reservation_status", "cancelled");
-
-      if (deleteCancelledError) {
-        console.error("Error deleting cancelled reservations:", deleteCancelledError);
-        throw new Error("Failed to delete cancelled reservations");
-      }
-
-      // Now delete the parking space
+      // Delete the parking space - CASCADE will automatically delete associated reservations
       const { error: deleteError } = await supabase
         .from("parking_spaces")
         .delete()
