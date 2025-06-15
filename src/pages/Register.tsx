@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MapPin, User, Building2, Eye, EyeOff, Phone } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Eye, EyeOff, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -15,33 +16,20 @@ const Register = () => {
   const navigate = useNavigate();
   const { isSignedIn } = useAuth();
   
-  // Driver form state
-  const [driverForm, setDriverForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false
-  });
-
-  // Owner form state
-  const [ownerForm, setOwnerForm] = useState({
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     businessName: "",
+    userType: "",
     password: "",
     confirmPassword: "",
     agreeToTerms: false
   });
 
-  const [showDriverPassword, setShowDriverPassword] = useState(false);
-  const [showDriverConfirmPassword, setShowDriverConfirmPassword] = useState(false);
-  const [showOwnerPassword, setShowOwnerPassword] = useState(false);
-  const [showOwnerConfirmPassword, setShowOwnerConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirect if already signed in
@@ -50,21 +38,27 @@ const Register = () => {
     return null;
   }
 
-  const handleDriverRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (driverForm.password !== driverForm.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match");
+      return;
+    }
+
+    if (!formData.userType) {
+      alert("Please select a user type");
       return;
     }
 
     setIsLoading(true);
     const result = await authService.signUp({
-      email: driverForm.email,
-      password: driverForm.password,
-      firstName: driverForm.firstName,
-      lastName: driverForm.lastName,
-      phone: driverForm.phone,
-      userType: 'driver'
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      businessName: formData.businessName || undefined,
+      userType: formData.userType as 'driver' | 'owner'
     });
 
     setIsLoading(false);
@@ -73,36 +67,8 @@ const Register = () => {
     }
   };
 
-  const handleOwnerRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (ownerForm.password !== ownerForm.confirmPassword) {
-      alert("Passwords don't match");
-      return;
-    }
-
-    setIsLoading(true);
-    const result = await authService.signUp({
-      email: ownerForm.email,
-      password: ownerForm.password,
-      firstName: ownerForm.firstName,
-      lastName: ownerForm.lastName,
-      phone: ownerForm.phone,
-      businessName: ownerForm.businessName,
-      userType: 'owner'
-    });
-
-    setIsLoading(false);
-    if (result.success) {
-      navigate('/login');
-    }
-  };
-
-  const updateDriverForm = (field: string, value: string | boolean) => {
-    setDriverForm(prev => ({ ...prev, [field]: value }));
-  };
-
-  const updateOwnerForm = (field: string, value: string | boolean) => {
-    setOwnerForm(prev => ({ ...prev, [field]: value }));
+  const updateForm = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -112,8 +78,9 @@ const Register = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-6 w-6 text-green-500" />
-              <h1 className="text-xl font-bold text-foreground">Parkiko</h1>
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <img src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png" alt="Parkiko Logo" className="h-8 w-auto" />
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <ThemeToggle />
@@ -133,297 +100,173 @@ const Register = () => {
           <Card>
             <CardHeader>
               <CardTitle>Create Account</CardTitle>
-              <CardDescription>Choose your account type to continue</CardDescription>
+              <CardDescription>Fill in your details to create your account</CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="driver" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="driver" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Driver
-                  </TabsTrigger>
-                  <TabsTrigger value="owner" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    Owner
-                  </TabsTrigger>
-                </TabsList>
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium mb-2">
+                      First Name
+                    </label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      placeholder="First name"
+                      value={formData.firstName}
+                      onChange={(e) => updateForm("firstName", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium mb-2">
+                      Last Name
+                    </label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Last name"
+                      value={formData.lastName}
+                      onChange={(e) => updateForm("lastName", e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="userType" className="block text-sm font-medium mb-2">
+                    Account Type
+                  </label>
+                  <Select value={formData.userType} onValueChange={(value) => updateForm("userType", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select account type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="driver">Driver - Find parking spaces</SelectItem>
+                      <SelectItem value="owner">Owner - List parking spaces</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                {/* Driver Registration */}
-                <TabsContent value="driver">
-                  <form onSubmit={handleDriverRegister} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="driver-firstName" className="block text-sm font-medium mb-2">
-                          First Name
-                        </label>
-                        <Input
-                          id="driver-firstName"
-                          type="text"
-                          placeholder="First name"
-                          value={driverForm.firstName}
-                          onChange={(e) => updateDriverForm("firstName", e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="driver-lastName" className="block text-sm font-medium mb-2">
-                          Last Name
-                        </label>
-                        <Input
-                          id="driver-lastName"
-                          type="text"
-                          placeholder="Last name"
-                          value={driverForm.lastName}
-                          onChange={(e) => updateDriverForm("lastName", e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="driver-email" className="block text-sm font-medium mb-2">
-                        Email Address
-                      </label>
-                      <Input
-                        id="driver-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={driverForm.email}
-                        onChange={(e) => updateDriverForm("email", e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="driver-phone" className="block text-sm font-medium mb-2">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="driver-phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={driverForm.phone}
-                          onChange={(e) => updateDriverForm("phone", e.target.value)}
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="driver-password" className="block text-sm font-medium mb-2">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id="driver-password"
-                          type={showDriverPassword ? "text" : "password"}
-                          placeholder="Create a password"
-                          value={driverForm.password}
-                          onChange={(e) => updateDriverForm("password", e.target.value)}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowDriverPassword(!showDriverPassword)}
-                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                        >
-                          {showDriverPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="driver-confirmPassword" className="block text-sm font-medium mb-2">
-                        Confirm Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id="driver-confirmPassword"
-                          type={showDriverConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm your password"
-                          value={driverForm.confirmPassword}
-                          onChange={(e) => updateDriverForm("confirmPassword", e.target.value)}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowDriverConfirmPassword(!showDriverConfirmPassword)}
-                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                        >
-                          {showDriverConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="driver-terms"
-                        checked={driverForm.agreeToTerms}
-                        onCheckedChange={(checked) => updateDriverForm("agreeToTerms", !!checked)}
-                      />
-                      <label htmlFor="driver-terms" className="text-sm text-muted-foreground">
-                        I agree to the{" "}
-                        <Link to="/terms" className="text-green-600 hover:text-green-700">
-                          Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link to="/privacy" className="text-green-600 hover:text-green-700">
-                          Privacy Policy
-                        </Link>
-                      </label>
-                    </div>
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-green-600 hover:bg-green-700" 
-                      disabled={!driverForm.agreeToTerms || isLoading}
-                    >
-                      {isLoading ? "Creating Account..." : "Create Driver Account"}
-                    </Button>
-                  </form>
-                </TabsContent>
+                {formData.userType === "owner" && (
+                  <div>
+                    <label htmlFor="businessName" className="block text-sm font-medium mb-2">
+                      Business Name (Optional)
+                    </label>
+                    <Input
+                      id="businessName"
+                      type="text"
+                      placeholder="Your business name"
+                      value={formData.businessName}
+                      onChange={(e) => updateForm("businessName", e.target.value)}
+                    />
+                  </div>
+                )}
 
-                {/* Owner Registration */}
-                <TabsContent value="owner">
-                  <form onSubmit={handleOwnerRegister} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="owner-firstName" className="block text-sm font-medium mb-2">
-                          First Name
-                        </label>
-                        <Input
-                          id="owner-firstName"
-                          type="text"
-                          placeholder="First name"
-                          value={ownerForm.firstName}
-                          onChange={(e) => updateOwnerForm("firstName", e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="owner-lastName" className="block text-sm font-medium mb-2">
-                          Last Name
-                        </label>
-                        <Input
-                          id="owner-lastName"
-                          type="text"
-                          placeholder="Last name"
-                          value={ownerForm.lastName}
-                          onChange={(e) => updateOwnerForm("lastName", e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="owner-businessName" className="block text-sm font-medium mb-2">
-                        Business Name (Optional)
-                      </label>
-                      <Input
-                        id="owner-businessName"
-                        type="text"
-                        placeholder="Your business name"
-                        value={ownerForm.businessName}
-                        onChange={(e) => updateOwnerForm("businessName", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="owner-email" className="block text-sm font-medium mb-2">
-                        Email Address
-                      </label>
-                      <Input
-                        id="owner-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={ownerForm.email}
-                        onChange={(e) => updateOwnerForm("email", e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="owner-phone" className="block text-sm font-medium mb-2">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="owner-phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={ownerForm.phone}
-                          onChange={(e) => updateOwnerForm("phone", e.target.value)}
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="owner-password" className="block text-sm font-medium mb-2">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id="owner-password"
-                          type={showOwnerPassword ? "text" : "password"}
-                          placeholder="Create a password"
-                          value={ownerForm.password}
-                          onChange={(e) => updateOwnerForm("password", e.target.value)}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowOwnerPassword(!showOwnerPassword)}
-                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                        >
-                          {showOwnerPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="owner-confirmPassword" className="block text-sm font-medium mb-2">
-                        Confirm Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id="owner-confirmPassword"
-                          type={showOwnerConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm your password"
-                          value={ownerForm.confirmPassword}
-                          onChange={(e) => updateOwnerForm("confirmPassword", e.target.value)}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowOwnerConfirmPassword(!showOwnerConfirmPassword)}
-                          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                        >
-                          {showOwnerConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="owner-terms"
-                        checked={ownerForm.agreeToTerms}
-                        onCheckedChange={(checked) => updateOwnerForm("agreeToTerms", !!checked)}
-                      />
-                      <label htmlFor="owner-terms" className="text-sm text-muted-foreground">
-                        I agree to the{" "}
-                        <Link to="/terms" className="text-green-600 hover:text-green-700">
-                          Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link to="/privacy" className="text-green-600 hover:text-green-700">
-                          Privacy Policy
-                        </Link>
-                      </label>
-                    </div>
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-green-600 hover:bg-green-700" 
-                      disabled={!ownerForm.agreeToTerms || isLoading}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-2">
+                    Email Address
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => updateForm("email", e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={formData.phone}
+                      onChange={(e) => updateForm("phone", e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a password"
+                      value={formData.password}
+                      onChange={(e) => updateForm("password", e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                     >
-                      {isLoading ? "Creating Account..." : "Create Owner Account"}
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => updateForm("confirmPassword", e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={formData.agreeToTerms}
+                    onCheckedChange={(checked) => updateForm("agreeToTerms", !!checked)}
+                  />
+                  <label htmlFor="terms" className="text-sm text-muted-foreground">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-green-600 hover:text-green-700">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="text-green-600 hover:text-green-700">
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-green-600 hover:bg-green-700" 
+                  disabled={!formData.agreeToTerms || !formData.userType || isLoading}
+                >
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              </form>
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
