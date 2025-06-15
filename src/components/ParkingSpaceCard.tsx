@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Car, Users } from "lucide-react";
+import { Car, Users, Truck, Bike } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ParkingSpace {
@@ -19,6 +19,8 @@ interface ParkingSpace {
   contact_email: string;
   image_urls: string[];
   user_id?: string;
+  vehicle_types?: string[];
+  vehicle_counts?: { [key: string]: number };
 }
 
 interface ParkingSpaceCardProps {
@@ -29,6 +31,18 @@ interface ParkingSpaceCardProps {
 const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
   const formatPrice = (price: number) => {
     return `₹${price}/hour`;
+  };
+
+  const getVehicleIcon = (vehicleType: string) => {
+    const type = vehicleType.toLowerCase();
+    if (type.includes('car') || type.includes('sedan') || type.includes('suv')) {
+      return <Car className="h-3 w-3" />;
+    } else if (type.includes('truck') || type.includes('van')) {
+      return <Truck className="h-3 w-3" />;
+    } else if (type.includes('bike') || type.includes('motorcycle')) {
+      return <Bike className="h-3 w-3" />;
+    }
+    return <Car className="h-3 w-3" />;
   };
 
   const getAvailabilityStatus = () => {
@@ -43,6 +57,8 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
   };
 
   const availabilityStatus = getAvailabilityStatus();
+  const hasVehicleTypes = space.vehicle_types && space.vehicle_types.length > 0;
+  const hasVehicleCounts = space.vehicle_counts && Object.keys(space.vehicle_counts).length > 0;
 
   return (
     <Card className="h-full flex flex-col">
@@ -79,6 +95,25 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
             <span>{space.available_spaces || 0}/{space.capacity}</span>
           </div>
         </div>
+
+        {/* Vehicle-specific availability */}
+        {hasVehicleTypes && hasVehicleCounts && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium mb-2 text-muted-foreground">Available by Vehicle Type:</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {space.vehicle_types.map((vehicleType) => {
+                const count = space.vehicle_counts?.[vehicleType] || 0;
+                return (
+                  <div key={vehicleType} className="flex items-center gap-1 text-xs">
+                    {getVehicleIcon(vehicleType)}
+                    <span className="truncate">{vehicleType}:</span>
+                    <span className="font-medium text-green-600">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         
         <p className="text-muted-foreground text-sm mb-4 flex-1">
           {space.description}

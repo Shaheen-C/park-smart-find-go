@@ -63,6 +63,12 @@ export const parkingService = {
       console.log("Proceeding to create parking space record...");
 
       const capacity = parseInt(data.capacity);
+      
+      // Calculate total available spaces from vehicle counts if provided
+      const totalAvailableSpaces = data.vehicleCounts 
+        ? Object.values(data.vehicleCounts).reduce((sum, count) => sum + count, 0)
+        : capacity;
+
       const { error } = await supabase
         .from('parking_spaces')
         .insert({
@@ -73,7 +79,7 @@ export const parkingService = {
           description: data.description,
           price_per_hour: parseFloat(data.pricePerHour),
           capacity: capacity,
-          available_spaces: capacity, // Initially set available spaces equal to capacity
+          available_spaces: totalAvailableSpaces,
           amenities: data.amenities,
           vehicle_types: data.vehicleTypes,
           vehicle_counts: data.vehicleCounts || {},

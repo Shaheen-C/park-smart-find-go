@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import VehicleAvailabilityEditor from "./VehicleAvailabilityEditor";
 
 interface ParkingSpace {
   id: string;
@@ -15,6 +16,8 @@ interface ParkingSpace {
   capacity: number;
   available_spaces: number;
   description: string;
+  vehicle_types: string[];
+  vehicle_counts: { [key: string]: number };
 }
 
 interface EditParkingModalProps {
@@ -25,17 +28,21 @@ interface EditParkingModalProps {
 }
 
 const EditParkingModal = ({ open, onOpenChange, parkingSpace, onUpdate }: EditParkingModalProps) => {
-  const [availableSpaces, setAvailableSpaces] = useState(parkingSpace.available_spaces);
+  const [vehicleCounts, setVehicleCounts] = useState<{ [key: string]: number }>(
+    parkingSpace.vehicle_counts || {}
+  );
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (availableSpaces < 0 || availableSpaces > parkingSpace.capacity) {
+    const totalAvailable = Object.values(vehicleCounts).reduce((sum, count) => sum + count, 0);
+    
+    if (totalAvailable > parkingSpace.capacity) {
       toast({
         title: "Invalid value",
-        description: `Available spaces must be between 0 and ${parkingSpace.capacity}`,
+        description: `Total available spaces cannot exceed capacity of ${parkingSpace.capacity}`,
         variant: "destructive"
       });
       return;
@@ -45,7 +52,10 @@ const EditParkingModal = ({ open, onOpenChange, parkingSpace, onUpdate }: EditPa
     try {
       const { error } = await supabase
         .from("parking_spaces")
-        .update({ available_spaces: availableSpaces })
+        .update({ 
+          vehicle_counts: vehicleCounts,
+          available_spaces: totalAvailable
+        })
         .eq("id", parkingSpace.id);
 
       if (error) throw error;
@@ -71,7 +81,7 @@ const EditParkingModal = ({ open, onOpenChange, parkingSpace, onUpdate }: EditPa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Update Available Spaces</DialogTitle>
         </DialogHeader>
@@ -94,21 +104,32 @@ const EditParkingModal = ({ open, onOpenChange, parkingSpace, onUpdate }: EditPa
               className="bg-muted"
             />
           </div>
-          <div>
-            <Label htmlFor="availableSpaces">Available Spaces</Label>
-            <Input
-              id="availableSpaces"
-              type="number"
-              min="0"
-              max={parkingSpace.capacity}
-              value={availableSpaces}
-              onChange={(e) => setAvailableSpaces(parseInt(e.target.value) || 0)}
-              required
+          
+          {parkingSpace.vehicle_types && parkingSpace.vehicle_types.length > 0 ? (
+            <VehicleAvailabilityEditor
+              vehicleTypes={parkingSpace.vehicle_types}
+              vehicleCounts={vehicleCounts}
+              capacity={parkingSpace.capacity}
+              onChange={setVehicleCounts}
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              Enter number between 0 and {parkingSpace.capacity}
-            </p>
-          </div>
+          ) : (
+            <div>
+              <Label htmlFor="availableSpaces">Available Spaces</Label>
+              <Input
+                id="availableSpaces"
+                type="number"
+                min="0"
+                max={parkingSpace.capacity}
+                value={parkingSpace.available_spaces || 0}
+                disabled
+                className="bg-muted"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                No vehicle types specified for this parking space
+              </p>
+            </div>
+          )}
+          
           <div className="flex gap-2">
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? "Updating..." : "Update"}

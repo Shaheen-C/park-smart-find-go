@@ -20,6 +20,8 @@ interface ParkingSpace {
   description: string;
   is_active: boolean;
   created_at: string;
+  vehicle_types: string[];
+  vehicle_counts: { [key: string]: number };
 }
 
 const ManageListings = () => {
@@ -119,6 +121,36 @@ const ManageListings = () => {
     setEditModalOpen(true);
   };
 
+  const getVehicleAvailabilityDisplay = (listing: ParkingSpace) => {
+    if (!listing.vehicle_types || !listing.vehicle_counts) {
+      return (
+        <div className="text-sm">
+          <span className="font-medium">Available: {listing.available_spaces || 0}</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-sm space-y-1">
+        <div className="font-medium">Vehicle Availability:</div>
+        <div className="grid grid-cols-2 gap-1 text-xs">
+          {listing.vehicle_types.map((vehicleType) => {
+            const count = listing.vehicle_counts[vehicleType] || 0;
+            return (
+              <div key={vehicleType} className="flex justify-between">
+                <span className="truncate">{vehicleType}:</span>
+                <span className="font-medium">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="pt-1 border-t">
+          <span className="font-medium">Total: {listing.available_spaces || 0}</span>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -216,8 +248,8 @@ const ManageListings = () => {
                       <Car className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Capacity: {listing.capacity}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Available: {listing.available_spaces || 0}</span>
+                    <div>
+                      {getVehicleAvailabilityDisplay(listing)}
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">₹{listing.price_per_hour}/hour</span>
