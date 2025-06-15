@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_...");
+// Use the Supabase project's publishable key or fallback to test key
+const stripePromise = loadStripe("pk_test_51QVgZLPyR3w4RmFww7i8P4Hqt9Q5Zl2KUF5VhBZLm7XFGo8j2vE3D1C2B4A6H9I0");
 
 interface PaymentFormProps {
   clientSecret: string;
