@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Calendar, User, MapPin, LogOut } from "lucide-react";
+import { Search, Calendar, User, MapPin, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -87,6 +88,12 @@ const Index = () => {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="mt-2 min-w-[160px] bg-card text-foreground shadow-lg rounded-lg border">
+                    <DropdownMenuItem
+                      onClick={() => navigate("/manage-listings")}
+                      className="cursor-pointer flex items-center gap-2"
+                    >
+                      <Settings className="h-4 w-4" /> Manage Listings
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={handleSignOut}
                       className="cursor-pointer flex items-center gap-2 text-red-600"

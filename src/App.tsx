@@ -13,6 +13,7 @@ import ListSpace from "./pages/ListSpace";
 import ParkingDetails from "./pages/ParkingDetails";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
+import ManageListings from "./pages/ManageListings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/search" element={<Search />} />
               <Route path="/list-space" element={<ListSpace />} />
+              <Route path="/manage-listings" element={<ManageListings />} />
               <Route path="/parking/:id" element={<ParkingDetails />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/register" element={<Register />} />
