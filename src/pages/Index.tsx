@@ -34,10 +34,9 @@ const Index = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10 shadow-lg">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center justify-center flex-1">
-            <Link to="/" className="flex flex-col items-center space-y-1 hover:opacity-80 transition-opacity">
-              <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-12 w-auto" />
-              <p className="text-sm text-white/70 font-medium">Park Smart, Park Easy</p>
+          <div className="flex items-center">
+            <Link to="/" className="hover:opacity-80 transition-opacity">
+              <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-8 w-auto" />
             </Link>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
@@ -77,6 +76,14 @@ const Index = () => {
       >
         <div className="absolute inset-0 bg-black opacity-90"></div>
         <div className="max-w-4xl mx-auto relative z-10">
+          {/* Prominent Slogan */}
+          <div className="mb-8">
+            <div className="inline-block bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent text-2xl md:text-3xl font-bold tracking-wide mb-2">
+              PARK SMART, PARK EASY
+            </div>
+            <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full"></div>
+          </div>
+          
           <h2 className="text-5xl font-bold text-foreground mb-6">
             Find & Book Parking Spaces Instantly
           </h2>
