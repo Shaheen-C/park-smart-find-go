@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import ParkingSpaceCard from "./ParkingSpaceCard";
-import EditParkingModal from "./EditParkingModal";
 import { useAuth } from "@/hooks/useAuth";
 
 interface ParkingSpace {
@@ -36,21 +35,7 @@ const ParkingSpacesList = ({
   parkingSpaces,
   onRefresh
 }: ParkingSpacesListProps) => {
-  const [editingSpace, setEditingSpace] = useState<ParkingSpace | null>(null);
   const { user } = useAuth();
-
-  const handleEditSpace = (space: ParkingSpace) => {
-    setEditingSpace(space);
-  };
-
-  const handleCloseEdit = () => {
-    setEditingSpace(null);
-  };
-
-  const handleSaveEdit = async () => {
-    await onRefresh();
-    setEditingSpace(null);
-  };
 
   if (loading) {
     return (
@@ -69,55 +54,43 @@ const ParkingSpacesList = ({
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Available Parking Spaces</CardTitle>
-              <CardDescription>
-                {filteredSpaces.length} space{filteredSpaces.length !== 1 ? 's' : ''} found
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={onRefresh}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Available Parking Spaces</CardTitle>
+            <CardDescription>
+              {filteredSpaces.length} space{filteredSpaces.length !== 1 ? 's' : ''} found
+            </CardDescription>
           </div>
-        </CardHeader>
-        <CardContent>
-          {filteredSpaces.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                {parkingSpaces.length === 0
-                  ? "No parking spaces available at the moment."
-                  : "No parking spaces match your search criteria."}
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {filteredSpaces.map((space) => (
-                <ParkingSpaceCard
-                  key={space.id}
-                  space={space}
-                  onEdit={handleEditSpace}
-                  currentUserId={user?.id}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {editingSpace && (
-        <EditParkingModal
-          space={editingSpace}
-          isOpen={!!editingSpace}
-          onClose={handleCloseEdit}
-          onSave={handleSaveEdit}
-        />
-      )}
-    </>
+          <Button variant="outline" size="sm" onClick={onRefresh}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {filteredSpaces.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              {parkingSpaces.length === 0
+                ? "No parking spaces available at the moment."
+                : "No parking spaces match your search criteria."}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {filteredSpaces.map((space) => (
+              <ParkingSpaceCard
+                key={space.id}
+                space={space}
+                currentUserId={user?.id}
+              />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

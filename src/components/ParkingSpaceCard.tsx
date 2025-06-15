@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Car, Edit, Users } from "lucide-react";
+import { MapPin, Car, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ParkingSpace {
@@ -23,12 +23,10 @@ interface ParkingSpace {
 
 interface ParkingSpaceCardProps {
   space: ParkingSpace;
-  showEditButton?: boolean;
-  onEdit?: (space: ParkingSpace) => void;
   currentUserId?: string;
 }
 
-const ParkingSpaceCard = ({ space, showEditButton = false, onEdit, currentUserId }: ParkingSpaceCardProps) => {
+const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
   const formatPrice = (price: number) => {
     return `₹${price}/hour`;
   };
@@ -44,38 +42,24 @@ const ParkingSpaceCard = ({ space, showEditButton = false, onEdit, currentUserId
     }
   };
 
-  const handleLocationClick = () => {
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     // Create Google Maps URL for directions
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(space.location)}`;
     window.open(googleMapsUrl, '_blank');
   };
 
   const availabilityStatus = getAvailabilityStatus();
-  const isOwner = currentUserId && space.user_id === currentUserId;
 
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{space.space_name}</CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge className={`px-2 py-1 text-xs ${availabilityStatus.color}`}>
-              {availabilityStatus.text}
-            </Badge>
-            {(showEditButton || isOwner) && onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onEdit(space);
-                }}
-                className="h-8 w-8 p-0"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <Badge className={`px-2 py-1 text-xs ${availabilityStatus.color}`}>
+            {availabilityStatus.text}
+          </Badge>
         </div>
         <CardDescription 
           className="flex items-center gap-2 text-green-600 hover:text-green-700 cursor-pointer transition-colors"

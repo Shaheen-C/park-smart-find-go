@@ -17,10 +17,12 @@ interface ParkingSpace {
   amenities: string[];
   created_at: string;
   capacity: number;
+  available_spaces: number;
   description: string;
   contact_phone: string;
   contact_email: string;
   image_urls: string[];
+  user_id?: string;
 }
 
 const Search = () => {
