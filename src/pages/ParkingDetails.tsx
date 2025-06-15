@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Phone, Mail, Car, Clock, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Mail, Car, Clock, Users, Truck, Bike } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { parkingService } from "@/services/parkingService";
@@ -23,6 +23,7 @@ interface ParkingSpace {
   contact_email: string;
   image_urls: string[];
   vehicle_types: string[];
+  vehicle_counts?: { [key: string]: number };
   additional_charges?: string;
 }
 
@@ -95,6 +96,18 @@ const ParkingDetails = () => {
     window.open(googleMapsUrl, '_blank');
   };
 
+  const getVehicleIcon = (vehicleType: string) => {
+    const type = vehicleType.toLowerCase();
+    if (type.includes('car') || type.includes('sedan') || type.includes('suv')) {
+      return <Car className="h-4 w-4" />;
+    } else if (type.includes('truck') || type.includes('van')) {
+      return <Truck className="h-4 w-4" />;
+    } else if (type.includes('bike') || type.includes('motorcycle')) {
+      return <Bike className="h-4 w-4" />;
+    }
+    return <Car className="h-4 w-4" />;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -153,6 +166,8 @@ const ParkingDetails = () => {
   }
 
   const availabilityStatus = getAvailabilityStatus();
+  const hasVehicleTypes = parkingSpace?.vehicle_types && parkingSpace.vehicle_types.length > 0;
+  const hasVehicleCounts = parkingSpace?.vehicle_counts && Object.keys(parkingSpace.vehicle_counts).length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -229,6 +244,36 @@ const ParkingDetails = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Vehicle Availability Details */}
+            {hasVehicleTypes && hasVehicleCounts && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    Available Spaces by Vehicle Type
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {parkingSpace.vehicle_types.map((vehicleType) => {
+                      const count = parkingSpace.vehicle_counts?.[vehicleType] || 0;
+                      return (
+                        <div key={vehicleType} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                          <div className="flex items-center gap-2">
+                            {getVehicleIcon(vehicleType)}
+                            <span className="font-medium">{vehicleType}</span>
+                          </div>
+                          <Badge variant={count > 0 ? "default" : "secondary"} className={count > 0 ? "bg-green-600" : ""}>
+                            {count} available
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Amenities */}
             <Card>

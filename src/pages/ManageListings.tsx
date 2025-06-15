@@ -1,14 +1,14 @@
-
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Edit, Users, Car } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, MapPin, Car, Clock, Eye, EyeOff, Edit } from "lucide-react";
-import BackButton from "@/components/BackButton";
 import EditParkingModal from "@/components/EditParkingModal";
+import ThemeToggle from "@/components/ThemeToggle";
+import BackButton from "@/components/BackButton";
+import { Link } from "react-router-dom";
 
 interface ParkingSpace {
   id: string;
@@ -18,10 +18,14 @@ interface ParkingSpace {
   capacity: number;
   available_spaces: number;
   description: string;
-  is_active: boolean;
-  created_at: string;
   vehicle_types: string[];
   vehicle_counts: { [key: string]: number };
+  amenities: string[];
+  contact_phone: string;
+  contact_email: string;
+  created_at: string;
+  image_urls: string[];
+  additional_charges?: string;
 }
 
 const ManageListings = () => {
