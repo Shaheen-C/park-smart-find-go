@@ -14,6 +14,7 @@ import ParkingDetails from "./pages/ParkingDetails";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import ManageListings from "./pages/ManageListings";
+import MyReservations from "./pages/MyReservations";
 import NearbyFacilitiesPage from "./pages/NearbyFacilities";
 import FastagRecharge from "./pages/FastagRecharge";
 import About from "./pages/About";
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/search" element={<Search />} />
               <Route path="/list-space" element={<ListSpace />} />
               <Route path="/manage-listings" element={<ManageListings />} />
+              <Route path="/my-reservations" element={<MyReservations />} />
               <Route path="/nearby-facilities" element={<NearbyFacilitiesPage />} />
               <Route path="/fastag-recharge" element={<FastagRecharge />} />
               <Route path="/about" element={<About />} />

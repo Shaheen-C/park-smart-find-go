@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       parking_reservations: {
         Row: {
+          cancelled_at: string | null
           contact_phone: string
           created_at: string
           duration_hours: number
@@ -29,6 +30,7 @@ export type Database = {
           vehicle_type: string
         }
         Insert: {
+          cancelled_at?: string | null
           contact_phone: string
           created_at?: string
           duration_hours: number
@@ -47,6 +49,7 @@ export type Database = {
           vehicle_type: string
         }
         Update: {
+          cancelled_at?: string | null
           contact_phone?: string
           created_at?: string
           duration_hours?: number
