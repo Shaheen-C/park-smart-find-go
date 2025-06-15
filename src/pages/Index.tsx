@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Calendar, User, MapPin, LogOut, Settings, CreditCard } from "lucide-react";
+import { Search, Calendar, User, MapPin, LogOut, Settings, CreditCard, Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -13,12 +13,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const { isSignedIn, setShowSignInModal, user, signOut } = useAuth();
   const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleFindParking = () => {
     if (isSignedIn) {
@@ -26,6 +32,7 @@ const Index = () => {
     } else {
       setShowSignInModal(true);
     }
+    setMobileMenuOpen(false);
   };
 
   const handleListSpace = () => {
@@ -34,10 +41,17 @@ const Index = () => {
     } else {
       setShowSignInModal(true);
     }
+    setMobileMenuOpen(false);
   };
 
   const handleSignOut = async () => {
     await signOut();
+    setMobileMenuOpen(false);
+  };
+
+  const handleMobileNavClick = (path: string) => {
+    navigate(path);
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -55,6 +69,8 @@ const Index = () => {
                 />
               </Link>
             </div>
+
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               <button
                 onClick={handleFindParking}
@@ -125,6 +141,114 @@ const Index = () => {
                 </>
               )}
             </nav>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex items-center space-x-2">
+              <ThemeToggle />
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-white/80 dark:text-white/80 light:text-black/80">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px]">
+                  <div className="flex flex-col space-y-4 mt-6">
+                    <button
+                      onClick={handleFindParking}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <Search className="h-5 w-5" />
+                      <span>Find Parking</span>
+                    </button>
+                    
+                    <button
+                      onClick={handleListSpace}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <MapPin className="h-5 w-5" />
+                      <span>List Your Space</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleMobileNavClick("/nearby-facilities")}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <MapPin className="h-5 w-5" />
+                      <span>Nearby Facilities</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleMobileNavClick("/fastag-recharge")}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <CreditCard className="h-5 w-5" />
+                      <span>FASTag Recharge</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleMobileNavClick("/about")}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <span>About</span>
+                    </button>
+
+                    <div className="border-t border-border pt-4">
+                      {isSignedIn ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 p-2 text-foreground">
+                            <User className="h-5 w-5" />
+                            <span className="font-medium">
+                              {user?.user_metadata?.first_name || user?.email}
+                            </span>
+                          </div>
+                          
+                          <button
+                            onClick={() => handleMobileNavClick("/my-reservations")}
+                            className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2 w-full"
+                          >
+                            <Calendar className="h-5 w-5" />
+                            <span>My Reservations</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => handleMobileNavClick("/manage-listings")}
+                            className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2 w-full"
+                          >
+                            <Settings className="h-5 w-5" />
+                            <span>Manage Listings</span>
+                          </button>
+                          
+                          <button
+                            onClick={handleSignOut}
+                            className="flex items-center space-x-2 text-left text-red-600 hover:text-red-700 transition-colors p-2 w-full"
+                          >
+                            <LogOut className="h-5 w-5" />
+                            <span>Logout</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Button 
+                            variant="outline" 
+                            className="w-full" 
+                            onClick={() => handleMobileNavClick("/login")}
+                          >
+                            Sign In
+                          </Button>
+                          <Button 
+                            className="w-full" 
+                            onClick={() => handleMobileNavClick("/register")}
+                          >
+                            Get Started
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </header>
