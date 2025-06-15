@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Upload, Check } from "lucide-react";
+import { Upload, Check, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useToast } from "@/hooks/use-toast";
 
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const { toast } = useToast();
   
   const form = useForm({
     defaultValues: {
@@ -22,7 +25,9 @@ const ListSpace = () => {
       capacity: "",
       amenities: [],
       contactPhone: "",
-      contactEmail: ""
+      contactEmail: "",
+      vehicleTypes: [],
+      additionalCharges: ""
     }
   });
 
@@ -44,9 +49,133 @@ const ListSpace = () => {
     "Disabled Access"
   ];
 
-  const onSubmit = (data: any) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newImages = Array.from(files);
+      
+      // Validate file types
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const invalidFiles = newImages.filter(file => !validTypes.includes(file.type));
+      
+      if (invalidFiles.length > 0) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload only JPG or PNG images.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate file sizes (10MB limit)
+      const oversizedFiles = newImages.filter(file => file.size > 10 * 1024 * 1024);
+      
+      if (oversizedFiles.length > 0) {
+        toast({
+          title: "File too large",
+          description: "Each image must be under 10MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setUploadedImages(prev => [...prev, ...newImages]);
+      toast({
+        title: "Images uploaded",
+        description: `${newImages.length} image(s) added successfully.`
+      });
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const onSubmit = async (data: any) => {
     console.log("Form submitted:", data);
-    // Handle form submission
+    console.log("Uploaded images:", uploadedImages);
+    
+    // Validate minimum images for step 3
+    if (currentStep === 4 && uploadedImages.length < 3) {
+      toast({
+        title: "Minimum images required",
+        description: "Please upload at least 3 photos of your parking space.",
+        variant: "destructive"
+      });
+      setCurrentStep(3);
+      return;
+    }
+
+    try {
+      // Here you would typically upload to your backend/storage
+      // For now, we'll just show a success message
+      toast({
+        title: "Listing submitted successfully!",
+        description: "Your parking space will be reviewed and published soon."
+      });
+      
+      // Reset form
+      form.reset();
+      setUploadedImages([]);
+      setCurrentStep(1);
+      
+    } catch (error) {
+      toast({
+        title: "Submission failed",
+        description: "There was an error submitting your listing. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleNext = () => {
+    // Basic validation before moving to next step
+    if (currentStep === 1) {
+      const { spaceName, location, description } = form.getValues();
+      if (!spaceName || !location || !description) {
+        toast({
+          title: "Please fill all required fields",
+          description: "Space name, location, and description are required.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    
+    if (currentStep === 2) {
+      const { pricePerHour, capacity } = form.getValues();
+      if (!pricePerHour || !capacity) {
+        toast({
+          title: "Please fill all required fields",
+          description: "Price per hour and capacity are required.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    if (currentStep === 3 && uploadedImages.length < 3) {
+      toast({
+        title: "Minimum images required",
+        description: "Please upload at least 3 photos of your parking space.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (currentStep === 4) {
+      const { contactPhone, contactEmail } = form.getValues();
+      if (!contactPhone || !contactEmail) {
+        toast({
+          title: "Please fill all required fields",
+          description: "Contact phone and email are required.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    setCurrentStep(Math.min(steps.length, currentStep + 1));
   };
 
   return (
@@ -116,7 +245,7 @@ const ListSpace = () => {
                       name="spaceName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Parking Space Name</FormLabel>
+                          <FormLabel>Parking Space Name *</FormLabel>
                           <FormControl>
                             <Input placeholder="e.g., Secure Residential Parking" {...field} />
                           </FormControl>
@@ -133,7 +262,7 @@ const ListSpace = () => {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Address</FormLabel>
+                          <FormLabel>Full Address *</FormLabel>
                           <FormControl>
                             <Input placeholder="Enter complete address with landmark" {...field} />
                           </FormControl>
@@ -150,7 +279,7 @@ const ListSpace = () => {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>Description *</FormLabel>
                           <FormControl>
                             <textarea 
                               className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -173,7 +302,7 @@ const ListSpace = () => {
                       name="pricePerHour"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Price per Hour (₹)</FormLabel>
+                          <FormLabel>Price per Hour (₹) *</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="50" {...field} />
                           </FormControl>
@@ -190,7 +319,7 @@ const ListSpace = () => {
                       name="capacity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Vehicle Capacity</FormLabel>
+                          <FormLabel>Vehicle Capacity *</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="2" {...field} />
                           </FormControl>
@@ -204,20 +333,51 @@ const ListSpace = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2">Vehicle Types Accepted</label>
-                        <div className="space-y-2">
-                          {["Cars", "SUVs", "Motorcycles", "Heavy Vehicles"].map((type) => (
-                            <label key={type} className="flex items-center space-x-2">
-                              <input type="checkbox" className="rounded" />
-                              <span className="text-sm">{type}</span>
-                            </label>
-                          ))}
-                        </div>
+                        <FormField
+                          control={form.control}
+                          name="vehicleTypes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Vehicle Types Accepted</FormLabel>
+                              <div className="space-y-2">
+                                {["Cars", "SUVs", "Motorcycles", "Heavy Vehicles"].map((type) => (
+                                  <label key={type} className="flex items-center space-x-2">
+                                    <input 
+                                      type="checkbox" 
+                                      className="rounded"
+                                      onChange={(e) => {
+                                        const currentTypes = field.value || [];
+                                        if (e.target.checked) {
+                                          field.onChange([...currentTypes, type]);
+                                        } else {
+                                          field.onChange(currentTypes.filter((t: string) => t !== type));
+                                        }
+                                      }}
+                                    />
+                                    <span className="text-sm">{type}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </FormItem>
+                          )}
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2">Additional Charges</label>
-                        <Input placeholder="Overnight parking: ₹200" />
-                        <p className="text-xs text-muted-foreground mt-1">Optional extra charges</p>
+                        <FormField
+                          control={form.control}
+                          name="additionalCharges"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Additional Charges</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Overnight parking: ₹200" {...field} />
+                              </FormControl>
+                              <FormDescription>
+                                Optional extra charges
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
@@ -228,24 +388,82 @@ const ListSpace = () => {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-medium mb-4">Available Amenities</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {amenityOptions.map((amenity) => (
-                          <label key={amenity} className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted">
-                            <input type="checkbox" className="rounded" />
-                            <span className="text-sm">{amenity}</span>
-                          </label>
-                        ))}
-                      </div>
+                      <FormField
+                        control={form.control}
+                        name="amenities"
+                        render={({ field }) => (
+                          <div className="grid grid-cols-2 gap-3">
+                            {amenityOptions.map((amenity) => (
+                              <label key={amenity} className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted cursor-pointer">
+                                <input 
+                                  type="checkbox" 
+                                  className="rounded"
+                                  onChange={(e) => {
+                                    const currentAmenities = field.value || [];
+                                    if (e.target.checked) {
+                                      field.onChange([...currentAmenities, amenity]);
+                                    } else {
+                                      field.onChange(currentAmenities.filter((a: string) => a !== amenity));
+                                    }
+                                  }}
+                                />
+                                <span className="text-sm">{amenity}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      />
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-medium mb-4">Upload Photos</h3>
+                      <h3 className="text-lg font-medium mb-4">Upload Photos *</h3>
                       <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
                         <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground">Click to upload photos of your parking space</p>
                         <p className="text-sm text-muted-foreground mt-2">JPG, PNG up to 10MB each. Minimum 3 photos required.</p>
-                        <Button variant="outline" className="mt-4">Choose Files</Button>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/jpeg,image/jpg,image/png"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label htmlFor="image-upload">
+                          <Button variant="outline" className="mt-4" type="button">
+                            Choose Files
+                          </Button>
+                        </label>
                       </div>
+                      
+                      {uploadedImages.length > 0 && (
+                        <div className="mt-4">
+                          <h4 className="font-medium mb-2">Uploaded Images ({uploadedImages.length})</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            {uploadedImages.map((image, index) => (
+                              <div key={index} className="relative">
+                                <img
+                                  src={URL.createObjectURL(image)}
+                                  alt={`Upload ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg"
+                                />
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute -top-2 -right-2 h-6 w-6"
+                                  onClick={() => removeImage(index)}
+                                  type="button"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                                <p className="text-xs text-muted-foreground mt-1 truncate">
+                                  {image.name}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -258,7 +476,7 @@ const ListSpace = () => {
                       name="contactPhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contact Phone Number</FormLabel>
+                          <FormLabel>Contact Phone Number *</FormLabel>
                           <FormControl>
                             <Input placeholder="+91 9876543210" {...field} />
                           </FormControl>
@@ -275,7 +493,7 @@ const ListSpace = () => {
                       name="contactEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email Address</FormLabel>
+                          <FormLabel>Email Address *</FormLabel>
                           <FormControl>
                             <Input type="email" placeholder="your.email@example.com" {...field} />
                           </FormControl>
@@ -318,7 +536,7 @@ const ListSpace = () => {
                   {currentStep < steps.length ? (
                     <Button 
                       type="button"
-                      onClick={() => setCurrentStep(Math.min(steps.length, currentStep + 1))}
+                      onClick={handleNext}
                     >
                       Next
                     </Button>
