@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -43,11 +42,12 @@ export const useListingActions = () => {
     try {
       console.log("Starting delete operation for space:", id, "user:", user.id);
       
-      // First, check if there are any reservations for this parking space
+      // First, check if there are any active (non-cancelled) reservations for this parking space
       const { data: reservations, error: reservationsError } = await supabase
         .from("parking_reservations")
         .select("id")
-        .eq("parking_space_id", id);
+        .eq("parking_space_id", id)
+        .neq("reservation_status", "cancelled");
 
       if (reservationsError) {
         console.error("Error checking reservations:", reservationsError);
@@ -55,16 +55,16 @@ export const useListingActions = () => {
       }
 
       if (reservations && reservations.length > 0) {
-        console.log(`Found ${reservations.length} reservations for this parking space`);
+        console.log(`Found ${reservations.length} active reservations for this parking space`);
         toast({
           title: "Cannot Delete",
-          description: `This parking space has ${reservations.length} existing reservation(s). Please contact support to handle existing reservations before deletion.`,
+          description: `This parking space has ${reservations.length} active reservation(s). Please wait for them to complete or contact the users to cancel before deletion.`,
           variant: "destructive",
         });
         return;
       }
 
-      // If no reservations, proceed with deletion
+      // If no active reservations, proceed with deletion
       const { error: deleteError } = await supabase
         .from("parking_spaces")
         .delete()
