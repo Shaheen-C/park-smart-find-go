@@ -9,6 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      parking_spaces: {
+        Row: {
+          additional_charges: string | null
+          amenities: string[] | null
+          capacity: number
+          contact_email: string
+          contact_phone: string
+          created_at: string
+          description: string
+          id: string
+          image_urls: string[] | null
+          is_active: boolean | null
+          location: string
+          price_per_hour: number
+          space_name: string
+          updated_at: string
+          user_id: string
+          vehicle_types: string[] | null
+        }
+        Insert: {
+          additional_charges?: string | null
+          amenities?: string[] | null
+          capacity: number
+          contact_email: string
+          contact_phone: string
+          created_at?: string
+          description: string
+          id?: string
+          image_urls?: string[] | null
+          is_active?: boolean | null
+          location: string
+          price_per_hour: number
+          space_name: string
+          updated_at?: string
+          user_id: string
+          vehicle_types?: string[] | null
+        }
+        Update: {
+          additional_charges?: string | null
+          amenities?: string[] | null
+          capacity?: number
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_urls?: string[] | null
+          is_active?: boolean | null
+          location?: string
+          price_per_hour?: number
+          space_name?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_types?: string[] | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           business_name: string | null

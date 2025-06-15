@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,16 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Upload, Check, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { parkingService, ParkingSpaceData } from "@/services/parkingService";
 
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { isSignedIn, setShowSignInModal } = useAuth();
+  const navigate = useNavigate();
   
   const form = useForm({
     defaultValues: {
@@ -121,24 +124,50 @@ const ListSpace = () => {
     console.log("Form data:", data);
     console.log("Uploaded images:", uploadedImages.length);
     
+    if (!isSignedIn) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to list your parking space.",
+        variant: "destructive"
+      });
+      setShowSignInModal(true);
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // For now, we'll store image file names as placeholders
+      // In a real app, you'd upload these to storage first
+      const imageUrls = uploadedImages.map(img => img.name);
       
-      // Here you would typically upload images and form data to your backend
-      console.log("Processing form submission...");
+      const parkingData: ParkingSpaceData = {
+        spaceName: data.spaceName,
+        location: data.location,
+        description: data.description,
+        pricePerHour: data.pricePerHour,
+        capacity: data.capacity,
+        amenities: data.amenities || [],
+        vehicleTypes: data.vehicleTypes || [],
+        contactPhone: data.contactPhone,
+        contactEmail: data.contactEmail,
+        additionalCharges: data.additionalCharges,
+        imageUrls: imageUrls
+      };
+
+      const result = await parkingService.createParkingSpace(parkingData);
       
-      toast({
-        title: "Listing submitted successfully!",
-        description: "Your parking space will be reviewed and published soon."
-      });
-      
-      // Reset form and images
-      form.reset();
-      setUploadedImages([]);
-      setCurrentStep(1);
+      if (result.success) {
+        // Reset form and images
+        form.reset();
+        setUploadedImages([]);
+        setCurrentStep(1);
+        
+        // Navigate to search page to see the listing
+        setTimeout(() => {
+          navigate('/search');
+        }, 2000);
+      }
       
     } catch (error) {
       console.error("Form submission error:", error);

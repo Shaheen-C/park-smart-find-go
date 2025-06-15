@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,45 +7,90 @@ import { Search as SearchIcon, Calendar, Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import { parkingService } from "@/services/parkingService";
+import { useToast } from "@/hooks/use-toast";
+
+interface ParkingSpace {
+  id: string;
+  space_name: string;
+  location: string;
+  price_per_hour: number;
+  amenities: string[];
+  created_at: string;
+  capacity: number;
+  description: string;
+  contact_phone: string;
+  contact_email: string;
+  image_urls: string[];
+}
 
 const Search = () => {
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [parkingSpaces, setParkingSpaces] = useState<ParkingSpace[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredSpaces, setFilteredSpaces] = useState<ParkingSpace[]>([]);
+  const { toast } = useToast();
 
-  // Mock parking spaces data
-  const parkingSpaces = [
-    {
-      id: 1,
-      name: "Secure Residential Parking",
-      location: "MG Road, Kochi",
-      price: "₹50/hour",
-      distance: "0.2 km away",
-      rating: 4.8,
-      amenities: ["CCTV", "Security", "Car Wash"],
-      available: true
-    },
-    {
-      id: 2,
-      name: "Commercial Complex Parking",
-      location: "Panampilly Nagar, Kochi",
-      price: "₹40/hour",
-      distance: "0.5 km away",
-      rating: 4.6,
-      amenities: ["Security", "Toilet", "24/7 Access"],
-      available: true
-    },
-    {
-      id: 3,
-      name: "Private Driveway",
-      location: "Kadavanthra, Kochi",
-      price: "₹30/hour",
-      distance: "0.8 km away",
-      rating: 4.9,
-      amenities: ["CCTV", "Covered"],
-      available: false
+  useEffect(() => {
+    loadParkingSpaces();
+  }, []);
+
+  useEffect(() => {
+    // Filter parking spaces based on location search
+    if (location.trim()) {
+      const filtered = parkingSpaces.filter(space =>
+        space.location.toLowerCase().includes(location.toLowerCase()) ||
+        space.space_name.toLowerCase().includes(location.toLowerCase())
+      );
+      setFilteredSpaces(filtered);
+    } else {
+      setFilteredSpaces(parkingSpaces);
     }
-  ];
+  }, [location, parkingSpaces]);
+
+  const loadParkingSpaces = async () => {
+    setLoading(true);
+    try {
+      const result = await parkingService.getParkingSpaces();
+      if (result.error) {
+        toast({
+          title: "Error loading parking spaces",
+          description: "Failed to fetch parking listings. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        setParkingSpaces(result.data);
+        setFilteredSpaces(result.data);
+      }
+    } catch (error) {
+      console.error("Error loading parking spaces:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while loading parking spaces.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    console.log("Search clicked with:", { location, date, time });
+    toast({
+      title: "Search functionality",
+      description: `Searching for parking in: ${location || 'all locations'}`
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return `₹${price}/hour`;
+  };
+
+  const formatAmenities = (amenities: string[]) => {
+    return amenities?.slice(0, 3) || [];
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,7 +162,7 @@ const Search = () => {
                 </div>
               </div>
               <div className="flex items-end">
-                <Button className="w-full bg-green-600 hover:bg-green-700">
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleSearch}>
                   <SearchIcon className="mr-2 h-4 w-4" />
                   Search
                 </Button>
@@ -128,45 +174,81 @@ const Search = () => {
         {/* Results */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">Available Parking Spaces</h2>
-            {parkingSpaces.map((space) => (
-              <Card key={space.id} className={!space.available ? 'opacity-60' : ''}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{space.name}</CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1">
-                        <MapPin className="h-4 w-4" />
-                        {space.location} • {space.distance}
-                      </CardDescription>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground">
+                {loading ? "Loading..." : `Available Parking Spaces (${filteredSpaces.length})`}
+              </h2>
+              {!loading && parkingSpaces.length > 0 && (
+                <Button variant="outline" onClick={loadParkingSpaces}>
+                  Refresh
+                </Button>
+              )}
+            </div>
+            
+            {loading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Loading parking spaces...</p>
+              </div>
+            ) : filteredSpaces.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  {parkingSpaces.length === 0 
+                    ? "No parking spaces listed yet. Be the first to list your space!" 
+                    : "No parking spaces found matching your search criteria."
+                  }
+                </p>
+                <Link to="/list-space">
+                  <Button className="mt-4">List Your Space</Button>
+                </Link>
+              </div>
+            ) : (
+              filteredSpaces.map((space) => (
+                <Card key={space.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{space.space_name}</CardTitle>
+                        <CardDescription className="flex items-center gap-1 mt-1">
+                          <MapPin className="h-4 w-4" />
+                          {space.location}
+                        </CardDescription>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-green-500">
+                          {formatPrice(space.price_per_hour)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Capacity: {space.capacity}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-green-500">{space.price}</div>
-                      <div className="text-sm text-muted-foreground">★ {space.rating}</div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {space.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {formatAmenities(space.amenities).map((amenity) => (
+                        <span key={amenity} className="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full">
+                          {amenity}
+                        </span>
+                      ))}
+                      {space.amenities?.length > 3 && (
+                        <span className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full">
+                          +{space.amenities.length - 3} more
+                        </span>
+                      )}
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {space.amenities.map((amenity) => (
-                      <span key={amenity} className="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full">
-                        {amenity}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant={space.available ? "default" : "secondary"} 
-                      disabled={!space.available}
-                      className="flex-1"
-                    >
-                      {space.available ? "Book Now" : "Not Available"}
-                    </Button>
-                    <Button variant="outline">View Details</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex gap-2">
+                      <Button className="flex-1">
+                        Book Now
+                      </Button>
+                      <Button variant="outline">View Details</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
 
           {/* Map Placeholder */}
