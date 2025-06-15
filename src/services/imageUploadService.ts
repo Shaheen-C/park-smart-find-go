@@ -55,7 +55,6 @@ export const imageUploadService = {
         if (error) {
           console.error('Upload error details:', error);
           console.error('Error message:', error.message);
-          console.error('Error code:', error.statusCode);
           
           // More specific error handling
           if (error.message.includes('The resource was not found')) {
