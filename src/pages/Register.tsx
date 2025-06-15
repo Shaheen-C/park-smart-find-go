@@ -1,8 +1,8 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
@@ -20,7 +20,6 @@ const Register = () => {
     email: "",
     phone: "",
     businessName: "",
-    userType: "",
     password: "",
     confirmPassword: ""
   });
@@ -42,11 +41,6 @@ const Register = () => {
       return;
     }
 
-    if (!formData.userType) {
-      alert("Please select a user type");
-      return;
-    }
-
     setIsLoading(true);
     const result = await authService.signUp({
       email: formData.email,
@@ -55,7 +49,7 @@ const Register = () => {
       lastName: formData.lastName,
       phone: formData.phone,
       businessName: formData.businessName || undefined,
-      userType: formData.userType as 'driver' | 'owner'
+      userType: 'driver' // Default user type set to 'driver'
     });
 
     setIsLoading(false);
@@ -129,36 +123,19 @@ const Register = () => {
                     />
                   </div>
                 </div>
-                
-                <div>
-                  <label htmlFor="userType" className="block text-sm font-medium mb-2">
-                    Account Type
-                  </label>
-                  <Select value={formData.userType} onValueChange={(value) => updateForm("userType", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select account type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="driver">Driver - Find parking spaces</SelectItem>
-                      <SelectItem value="owner">Owner - List parking spaces</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                {formData.userType === "owner" && (
-                  <div>
-                    <label htmlFor="businessName" className="block text-sm font-medium mb-2">
-                      Business Name (Optional)
-                    </label>
-                    <Input
-                      id="businessName"
-                      type="text"
-                      placeholder="Your business name"
-                      value={formData.businessName}
-                      onChange={(e) => updateForm("businessName", e.target.value)}
-                    />
-                  </div>
-                )}
+                <div>
+                  <label htmlFor="businessName" className="block text-sm font-medium mb-2">
+                    Business Name (Optional)
+                  </label>
+                  <Input
+                    id="businessName"
+                    type="text"
+                    placeholder="Your business name"
+                    value={formData.businessName}
+                    onChange={(e) => updateForm("businessName", e.target.value)}
+                  />
+                </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2">
@@ -241,7 +218,7 @@ const Register = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-green-600 hover:bg-green-700" 
-                  disabled={!formData.userType || isLoading}
+                  disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
