@@ -3,49 +3,32 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Building2, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/services/auth";
 
 const SignInModal = () => {
   const { showSignInModal, setShowSignInModal } = useAuth();
-  const [driverEmail, setDriverEmail] = useState("");
-  const [driverPassword, setDriverPassword] = useState("");
-  const [ownerEmail, setOwnerEmail] = useState("");
-  const [ownerPassword, setOwnerPassword] = useState("");
-  const [showDriverPassword, setShowDriverPassword] = useState(false);
-  const [showOwnerPassword, setShowOwnerPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleDriverSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     const result = await authService.signIn({
-      email: driverEmail,
-      password: driverPassword
+      email,
+      password
     });
 
     setIsLoading(false);
     if (result.success) {
       setShowSignInModal(false);
-    }
-  };
-
-  const handleOwnerSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    const result = await authService.signIn({
-      email: ownerEmail,
-      password: ownerPassword
-    });
-
-    setIsLoading(false);
-    if (result.success) {
-      setShowSignInModal(false);
+      setEmail("");
+      setPassword("");
     }
   };
 
@@ -56,112 +39,50 @@ const SignInModal = () => {
           <DialogTitle>Sign In to Continue</DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="driver" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="driver" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Driver
-            </TabsTrigger>
-            <TabsTrigger value="owner" className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Owner
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="driver">
-            <form onSubmit={handleDriverSignIn} className="space-y-4">
-              <div>
-                <label htmlFor="driver-email-modal" className="block text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <Input
-                  id="driver-email-modal"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={driverEmail}
-                  onChange={(e) => setDriverEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="driver-password-modal" className="block text-sm font-medium mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="driver-password-modal"
-                    type={showDriverPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={driverPassword}
-                    onChange={(e) => setDriverPassword(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowDriverPassword(!showDriverPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showDriverPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <div>
+            <label htmlFor="email-modal" className="block text-sm font-medium mb-2">
+              Email Address
+            </label>
+            <Input
+              id="email-modal"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password-modal" className="block text-sm font-medium mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <Input
+                id="password-modal"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
               >
-                {isLoading ? "Signing In..." : "Sign In as Driver"}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="owner">
-            <form onSubmit={handleOwnerSignIn} className="space-y-4">
-              <div>
-                <label htmlFor="owner-email-modal" className="block text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <Input
-                  id="owner-email-modal"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={ownerEmail}
-                  onChange={(e) => setOwnerEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="owner-password-modal" className="block text-sm font-medium mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="owner-password-modal"
-                    type={showOwnerPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={ownerPassword}
-                    onChange={(e) => setOwnerPassword(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowOwnerPassword(!showOwnerPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showOwnerPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing In..." : "Sign In as Owner"}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
 
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">

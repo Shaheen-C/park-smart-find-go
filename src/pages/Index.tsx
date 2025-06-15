@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Calendar, User, MapPin } from "lucide-react";
+import { Search, Calendar, User, MapPin, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
-  const { isSignedIn, setShowSignInModal } = useAuth();
+  const { isSignedIn, setShowSignInModal, user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleFindParking = () => {
@@ -26,6 +26,10 @@ const Index = () => {
     } else {
       setShowSignInModal(true);
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   return (
@@ -54,12 +58,27 @@ const Index = () => {
               </button>
               <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">About</Link>
               <ThemeToggle />
-              <Button variant="outline" asChild>
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/register">Get Started</Link>
-              </Button>
+              
+              {isSignedIn ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-white/80 dark:text-white/80 light:text-black/80">
+                    Welcome, {user?.user_metadata?.first_name || user?.email}
+                  </span>
+                  <Button variant="outline" onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/register">Get Started</Link>
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         </div>
