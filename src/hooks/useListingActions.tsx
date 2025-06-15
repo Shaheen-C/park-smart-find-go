@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -64,7 +65,20 @@ export const useListingActions = () => {
         return;
       }
 
-      // If no active reservations, proceed with deletion
+      // Delete any cancelled reservations first to avoid foreign key constraint issues
+      console.log("Deleting cancelled reservations for space:", id);
+      const { error: deleteCancelledError } = await supabase
+        .from("parking_reservations")
+        .delete()
+        .eq("parking_space_id", id)
+        .eq("reservation_status", "cancelled");
+
+      if (deleteCancelledError) {
+        console.error("Error deleting cancelled reservations:", deleteCancelledError);
+        throw new Error("Failed to delete cancelled reservations");
+      }
+
+      // Now delete the parking space
       const { error: deleteError } = await supabase
         .from("parking_spaces")
         .delete()
