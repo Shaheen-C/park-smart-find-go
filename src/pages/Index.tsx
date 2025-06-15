@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Search, Calendar, User } from "lucide-react";
+import { Search, Calendar, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -36,7 +37,7 @@ const Index = () => {
           <div className="flex items-center justify-center flex-1">
             <Link to="/" className="flex flex-col items-center space-y-1 hover:opacity-80 transition-opacity">
               <div className="flex items-center space-x-2">
-                <MapPin className="h-8 w-8 text-green-500" />
+                <img src="/lovable-uploads/83d99fd1-b1f1-4e81-9074-0bf97e3e0c41.png" alt="Parkiko Logo" className="h-8 w-8" />
                 <h1 className="text-2xl font-bold text-green-500">Parkiko</h1>
               </div>
               <p className="text-sm text-white/70 font-medium">Park Smart, Park Easy</p>
