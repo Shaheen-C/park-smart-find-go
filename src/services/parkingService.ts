@@ -22,25 +22,45 @@ export interface ParkingSpaceData {
 export const parkingService = {
   async createParkingSpace(data: ParkingSpaceData) {
     try {
+      console.log("Creating parking space with data:", data);
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
+        console.error("User not authenticated");
         toast.error("You must be logged in to list a parking space");
         return { success: false, error: "Not authenticated" };
       }
 
+      console.log("User authenticated, ID:", user.id);
+
       // Upload images first if provided
       let imageUrls: string[] = [];
       if (data.images && data.images.length > 0) {
-        console.log("Uploading images...", data.images.length);
-        imageUrls = await imageUploadService.uploadImages(data.images);
-        console.log("Images uploaded:", imageUrls);
+        console.log("Starting image upload process with", data.images.length, "images");
         
-        if (imageUrls.length === 0) {
+        try {
+          imageUrls = await imageUploadService.uploadImages(data.images);
+          console.log("Image upload completed. URLs received:", imageUrls);
+          
+          if (imageUrls.length === 0) {
+            console.error("No images were successfully uploaded");
+            toast.error("Failed to upload images. Please try again.");
+            return { success: false, error: "Image upload failed" };
+          }
+          
+          if (imageUrls.length < data.images.length) {
+            console.warn(`Only ${imageUrls.length} out of ${data.images.length} images uploaded successfully`);
+            toast.error(`Only ${imageUrls.length} out of ${data.images.length} images uploaded successfully`);
+          }
+        } catch (uploadError) {
+          console.error("Image upload service error:", uploadError);
           toast.error("Failed to upload images. Please try again.");
           return { success: false, error: "Image upload failed" };
         }
       }
+
+      console.log("Proceeding to create parking space record...");
 
       const { error } = await supabase
         .from('parking_spaces')
@@ -67,10 +87,11 @@ export const parkingService = {
         return { success: false, error };
       }
 
+      console.log("Parking space created successfully!");
       toast.success("Parking space listed successfully!");
       return { success: true };
     } catch (error) {
-      console.error("Unexpected error:", error);
+      console.error("Unexpected error in createParkingSpace:", error);
       toast.error("An unexpected error occurred");
       return { success: false, error };
     }
