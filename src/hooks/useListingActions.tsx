@@ -43,6 +43,28 @@ export const useListingActions = () => {
     try {
       console.log("Starting delete operation for space:", id, "user:", user.id);
       
+      // First, check if there are any reservations for this parking space
+      const { data: reservations, error: reservationsError } = await supabase
+        .from("parking_reservations")
+        .select("id")
+        .eq("parking_space_id", id);
+
+      if (reservationsError) {
+        console.error("Error checking reservations:", reservationsError);
+        throw new Error("Failed to check existing reservations");
+      }
+
+      if (reservations && reservations.length > 0) {
+        console.log(`Found ${reservations.length} reservations for this parking space`);
+        toast({
+          title: "Cannot Delete",
+          description: `This parking space has ${reservations.length} existing reservation(s). Please contact support to handle existing reservations before deletion.`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If no reservations, proceed with deletion
       const { error: deleteError } = await supabase
         .from("parking_spaces")
         .delete()
