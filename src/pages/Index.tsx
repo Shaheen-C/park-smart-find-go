@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,34 +32,36 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10 shadow-lg">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <Link to="/" className="hover:opacity-80 transition-opacity">
-              <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-8 w-auto" />
-            </Link>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-8 w-auto" />
+              </Link>
+            </div>
+            <nav className="hidden md:flex items-center space-x-6">
+              <button 
+                onClick={handleFindParking}
+                className="text-white/80 hover:text-green-500 transition-colors"
+              >
+                Find Parking
+              </button>
+              <button 
+                onClick={handleListSpace}
+                className="text-white/80 hover:text-green-500 transition-colors"
+              >
+                List Your Space
+              </button>
+              <Link to="/about" className="text-white/80 hover:text-green-500 transition-colors">About</Link>
+              <ThemeToggle />
+              <Button variant="outline" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/register">Get Started</Link>
+              </Button>
+            </nav>
           </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <button 
-              onClick={handleFindParking}
-              className="text-white/80 hover:text-green-500 transition-colors"
-            >
-              Find Parking
-            </button>
-            <button 
-              onClick={handleListSpace}
-              className="text-white/80 hover:text-green-500 transition-colors"
-            >
-              List Your Space
-            </button>
-            <Link to="/about" className="text-white/80 hover:text-green-500 transition-colors">About</Link>
-            <ThemeToggle />
-            <Button variant="outline" asChild>
-              <Link to="/login">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/register">Get Started</Link>
-            </Button>
-          </nav>
         </div>
       </header>
 
