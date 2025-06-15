@@ -95,6 +95,12 @@ const Index = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="mt-2 min-w-[160px] bg-card text-foreground shadow-lg rounded-lg border">
                     <DropdownMenuItem
+                      onClick={() => navigate("/my-reservations")}
+                      className="cursor-pointer flex items-center gap-2"
+                    >
+                      <Calendar className="h-4 w-4" /> My Reservations
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => navigate("/manage-listings")}
                       className="cursor-pointer flex items-center gap-2"
                     >
