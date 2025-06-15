@@ -123,12 +123,22 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
         resetForm();
       } else {
         // Handle online payment
+        console.log("Creating payment intent for reservation:", reservationData);
+        
         const { data, error } = await supabase.functions.invoke('create-payment', {
           body: { reservationData }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Payment creation error:", error);
+          throw new Error(error.message || "Failed to create payment");
+        }
 
+        if (!data?.clientSecret) {
+          throw new Error("No payment session created. Please try again.");
+        }
+
+        console.log("Payment intent created successfully");
         setClientSecret(data.clientSecret);
         setReservationId(data.reservationId);
         setShowPayment(true);
@@ -137,7 +147,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
       console.error("Error creating reservation:", error);
       toast({
         title: "Error",
-        description: "Failed to create reservation. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create reservation. Please try again.",
         variant: "destructive",
       });
     } finally {

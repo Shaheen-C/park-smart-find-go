@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-// Use the Supabase project's publishable key or fallback to test key
+// You'll need to replace this with your actual Stripe publishable key
 const stripePromise = loadStripe("pk_test_51QVgZLPyR3w4RmFww7i8P4Hqt9Q5Zl2KUF5VhBZLm7XFGo8j2vE3D1C2B4A6H9I0");
 
 interface PaymentFormProps {
@@ -26,14 +26,31 @@ const PaymentFormContent = ({ clientSecret, reservationId, amount, onSuccess, on
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      toast({
+        title: "Payment system not ready",
+        description: "Please wait for the payment system to load.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     
     const cardElement = elements.getElement(CardElement);
-    if (!cardElement) return;
+    if (!cardElement) {
+      toast({
+        title: "Payment form error",
+        description: "Card element not found. Please refresh and try again.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log("Attempting to confirm payment with client secret:", clientSecret);
+      
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
@@ -44,26 +61,37 @@ const PaymentFormContent = ({ clientSecret, reservationId, amount, onSuccess, on
         console.error("Payment failed:", error);
         toast({
           title: "Payment failed",
-          description: error.message,
+          description: error.message || "Payment processing failed. Please try again.",
           variant: "destructive",
         });
-      } else if (paymentIntent.status === 'succeeded') {
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log("Payment succeeded, confirming on backend");
+        
         // Confirm payment on backend
-        await supabase.functions.invoke('confirm-payment', {
+        const { error: confirmError } = await supabase.functions.invoke('confirm-payment', {
           body: { paymentIntentId: paymentIntent.id }
         });
         
-        toast({
-          title: "Payment successful!",
-          description: "Your parking space has been reserved.",
-        });
-        onSuccess();
+        if (confirmError) {
+          console.error("Backend confirmation failed:", confirmError);
+          toast({
+            title: "Payment confirmation error",
+            description: "Payment processed but confirmation failed. Please contact support.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Payment successful!",
+            description: "Your parking space has been reserved.",
+          });
+          onSuccess();
+        }
       }
     } catch (error) {
       console.error("Payment error:", error);
       toast({
         title: "Payment error",
-        description: "Something went wrong. Please try again.",
+        description: "Something went wrong during payment processing. Please try again.",
         variant: "destructive",
       });
     } finally {
