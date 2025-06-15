@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -183,15 +182,9 @@ const ParkingDetails = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
-                    Book Now
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call Owner
-                  </Button>
-                </div>
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  Book Now
+                </Button>
               </CardContent>
             </Card>
 
