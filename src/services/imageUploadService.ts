@@ -7,6 +7,14 @@ export const imageUploadService = {
     console.log("Starting image upload process...");
     console.log("Number of images to upload:", images.length);
     
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.error("User not authenticated");
+      toast.error("You must be logged in to upload images");
+      return [];
+    }
+    
     const uploadedUrls: string[] = [];
     
     for (const image of images) {
@@ -28,23 +36,15 @@ export const imageUploadService = {
           continue;
         }
         
-        // Generate unique filename
+        // Generate unique filename with user folder structure
         const timestamp = Date.now();
         const randomString = Math.random().toString(36).substring(2);
         const fileExtension = image.name.split('.').pop()?.toLowerCase();
-        const fileName = `parking-${timestamp}-${randomString}.${fileExtension}`;
+        const fileName = `${user.id}/parking-${timestamp}-${randomString}.${fileExtension}`;
         
         console.log(`Uploading image: ${fileName}`);
         
-        // Check if bucket exists and is accessible
-        const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-        console.log("Available buckets:", buckets);
-        if (bucketError) {
-          console.error("Error listing buckets:", bucketError);
-        }
-        
         // Upload to Supabase Storage
-        console.log("Attempting upload to parking-images bucket...");
         const { data, error } = await supabase.storage
           .from('parking-images')
           .upload(fileName, image, {
