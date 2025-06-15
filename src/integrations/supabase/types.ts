@@ -21,11 +21,15 @@ export type Database = {
           id: string
           image_urls: string[] | null
           is_active: boolean | null
+          latitude: number | null
           location: string
+          longitude: number | null
+          precise_location: string | null
           price_per_hour: number
           space_name: string
           updated_at: string
           user_id: string
+          vehicle_counts: Json | null
           vehicle_types: string[] | null
         }
         Insert: {
@@ -39,11 +43,15 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_active?: boolean | null
+          latitude?: number | null
           location: string
+          longitude?: number | null
+          precise_location?: string | null
           price_per_hour: number
           space_name: string
           updated_at?: string
           user_id: string
+          vehicle_counts?: Json | null
           vehicle_types?: string[] | null
         }
         Update: {
@@ -57,11 +65,15 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_active?: boolean | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
+          precise_location?: string | null
           price_per_hour?: number
           space_name?: string
           updated_at?: string
           user_id?: string
+          vehicle_counts?: Json | null
           vehicle_types?: string[] | null
         }
         Relationships: []

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +13,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { parkingService, ParkingSpaceData } from "@/services/parkingService";
 
+interface VehicleCount {
+  [key: string]: number;
+}
+
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [vehicleCounts, setVehicleCounts] = useState<VehicleCount>({});
   const { toast } = useToast();
   const { isSignedIn, setShowSignInModal } = useAuth();
   const navigate = useNavigate();
@@ -24,6 +30,7 @@ const ListSpace = () => {
     defaultValues: {
       spaceName: "",
       location: "",
+      preciseLocation: "",
       description: "",
       pricePerHour: "",
       capacity: "",
@@ -52,6 +59,8 @@ const ListSpace = () => {
     "Electric Vehicle Charging",
     "Disabled Access"
   ];
+
+  const vehicleTypeOptions = ["Cars", "SUVs", "Motorcycles", "Heavy Vehicles"];
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("Image upload triggered");
@@ -119,10 +128,36 @@ const ListSpace = () => {
     });
   };
 
+  const handleVehicleTypeChange = (vehicleType: string, isChecked: boolean) => {
+    const currentTypes = form.getValues("vehicleTypes") || [];
+    let newTypes: string[];
+    
+    if (isChecked) {
+      newTypes = [...currentTypes, vehicleType];
+      // Initialize count for new vehicle type
+      setVehicleCounts(prev => ({ ...prev, [vehicleType]: 1 }));
+    } else {
+      newTypes = currentTypes.filter((type: string) => type !== vehicleType);
+      // Remove count for unchecked vehicle type
+      setVehicleCounts(prev => {
+        const updated = { ...prev };
+        delete updated[vehicleType];
+        return updated;
+      });
+    }
+    
+    form.setValue("vehicleTypes", newTypes);
+  };
+
+  const handleVehicleCountChange = (vehicleType: string, count: number) => {
+    setVehicleCounts(prev => ({ ...prev, [vehicleType]: count }));
+  };
+
   const onSubmit = async (data: any) => {
     console.log("Form submission started");
     console.log("Form data:", data);
     console.log("Uploaded images:", uploadedImages.length);
+    console.log("Vehicle counts:", vehicleCounts);
     
     if (!isSignedIn) {
       toast({
@@ -144,11 +179,13 @@ const ListSpace = () => {
       const parkingData: ParkingSpaceData = {
         spaceName: data.spaceName,
         location: data.location,
+        preciseLocation: data.preciseLocation,
         description: data.description,
         pricePerHour: data.pricePerHour,
         capacity: data.capacity,
         amenities: data.amenities || [],
         vehicleTypes: data.vehicleTypes || [],
+        vehicleCounts: vehicleCounts,
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
         additionalCharges: data.additionalCharges,
@@ -161,6 +198,7 @@ const ListSpace = () => {
         // Reset form and images
         form.reset();
         setUploadedImages([]);
+        setVehicleCounts({});
         setCurrentStep(1);
         
         // Navigate to search page to see the listing
@@ -186,11 +224,11 @@ const ListSpace = () => {
     
     // Basic validation before moving to next step
     if (currentStep === 1) {
-      const { spaceName, location, description } = form.getValues();
-      if (!spaceName || !location || !description) {
+      const { spaceName, location, preciseLocation, description } = form.getValues();
+      if (!spaceName || !location || !preciseLocation || !description) {
         toast({
           title: "Please fill all required fields",
-          description: "Space name, location, and description are required.",
+          description: "Space name, location, precise location, and description are required.",
           variant: "destructive"
         });
         return;
@@ -198,7 +236,7 @@ const ListSpace = () => {
     }
     
     if (currentStep === 2) {
-      const { pricePerHour, capacity } = form.getValues();
+      const { pricePerHour, capacity, vehicleTypes } = form.getValues();
       if (!pricePerHour || !capacity) {
         toast({
           title: "Please fill all required fields",
@@ -206,6 +244,19 @@ const ListSpace = () => {
           variant: "destructive"
         });
         return;
+      }
+
+      // Validate vehicle counts
+      if (vehicleTypes && vehicleTypes.length > 0) {
+        const missingCounts = vehicleTypes.filter((type: string) => !vehicleCounts[type] || vehicleCounts[type] <= 0);
+        if (missingCounts.length > 0) {
+          toast({
+            title: "Vehicle counts required",
+            description: "Please specify how many vehicles of each selected type can fit.",
+            variant: "destructive"
+          });
+          return;
+        }
       }
     }
 
@@ -216,18 +267,6 @@ const ListSpace = () => {
         variant: "destructive"
       });
       return;
-    }
-
-    if (currentStep === 4) {
-      const { contactPhone, contactEmail } = form.getValues();
-      if (!contactPhone || !contactEmail) {
-        toast({
-          title: "Please fill all required fields",
-          description: "Contact phone and email are required.",
-          variant: "destructive"
-        });
-        return;
-      }
     }
 
     setCurrentStep(Math.min(steps.length, currentStep + 1));
@@ -325,12 +364,29 @@ const ListSpace = () => {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Address *</FormLabel>
+                          <FormLabel>General Location *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter complete address with landmark" {...field} />
+                            <Input placeholder="e.g., Sector 15, Gurgaon" {...field} />
                           </FormControl>
                           <FormDescription>
-                            Provide detailed address for easy navigation
+                            Provide general area or neighborhood
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="preciseLocation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Precise Location *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Complete address with building name, landmarks" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            This will be used for Google Maps navigation. Include building name, street address, and nearby landmarks.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -381,67 +437,70 @@ const ListSpace = () => {
                       name="capacity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Vehicle Capacity *</FormLabel>
+                          <FormLabel>Total Vehicle Capacity *</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="2" {...field} />
+                            <Input type="number" placeholder="5" {...field} />
                           </FormControl>
                           <FormDescription>
-                            How many vehicles can park simultaneously?
+                            Maximum number of vehicles that can park simultaneously
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <FormField
-                          control={form.control}
-                          name="vehicleTypes"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Vehicle Types Accepted</FormLabel>
-                              <div className="space-y-2">
-                                {["Cars", "SUVs", "Motorcycles", "Heavy Vehicles"].map((type) => (
-                                  <label key={type} className="flex items-center space-x-2">
-                                    <input 
-                                      type="checkbox" 
-                                      className="rounded"
-                                      onChange={(e) => {
-                                        const currentTypes = field.value || [];
-                                        if (e.target.checked) {
-                                          field.onChange([...currentTypes, type]);
-                                        } else {
-                                          field.onChange(currentTypes.filter((t: string) => t !== type));
-                                        }
-                                      }}
-                                    />
-                                    <span className="text-sm">{type}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div>
-                        <FormField
-                          control={form.control}
-                          name="additionalCharges"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Additional Charges</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Overnight parking: ₹200" {...field} />
-                              </FormControl>
-                              <FormDescription>
-                                Optional extra charges
-                              </FormDescription>
-                            </FormItem>
-                          )}
-                        />
+                    <div>
+                      <FormLabel>Vehicle Types & Capacity *</FormLabel>
+                      <FormDescription className="mb-3">
+                        Select vehicle types and specify how many of each type can fit
+                      </FormDescription>
+                      <div className="space-y-3">
+                        {vehicleTypeOptions.map((type) => {
+                          const isSelected = form.getValues("vehicleTypes")?.includes(type);
+                          return (
+                            <div key={type} className="flex items-center space-x-4 p-3 border border-border rounded-lg">
+                              <label className="flex items-center space-x-2 flex-1">
+                                <input 
+                                  type="checkbox" 
+                                  className="rounded"
+                                  checked={isSelected}
+                                  onChange={(e) => handleVehicleTypeChange(type, e.target.checked)}
+                                />
+                                <span className="text-sm font-medium">{type}</span>
+                              </label>
+                              {isSelected && (
+                                <div className="flex items-center space-x-2">
+                                  <label className="text-sm text-muted-foreground">Count:</label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={vehicleCounts[type] || 1}
+                                    onChange={(e) => handleVehicleCountChange(type, parseInt(e.target.value) || 1)}
+                                    className="w-16"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="additionalCharges"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Additional Charges</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Overnight parking: ₹200" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Optional extra charges
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 )}
 
