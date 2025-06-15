@@ -17,6 +17,7 @@ export interface ParkingSpaceData {
   contactEmail: string;
   additionalCharges?: string;
   images?: File[];
+  acceptsCashOnArrival?: boolean;
 }
 
 export const parkingService = {
@@ -86,7 +87,8 @@ export const parkingService = {
           contact_phone: data.contactPhone,
           contact_email: data.contactEmail,
           additional_charges: data.additionalCharges || null,
-          image_urls: imageUrls
+          image_urls: imageUrls,
+          accepts_cash_on_arrival: data.acceptsCashOnArrival || false
         });
 
       if (error) {

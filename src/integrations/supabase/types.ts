@@ -9,8 +9,68 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      parking_reservations: {
+        Row: {
+          contact_phone: string
+          created_at: string
+          duration_hours: number
+          estimated_arrival_time: string
+          id: string
+          parking_space_id: string
+          payment_method: string
+          reservation_status: string
+          special_instructions: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string
+          vehicle_number: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          contact_phone: string
+          created_at?: string
+          duration_hours: number
+          estimated_arrival_time: string
+          id?: string
+          parking_space_id: string
+          payment_method: string
+          reservation_status?: string
+          special_instructions?: string | null
+          total_amount: number
+          updated_at?: string
+          user_id: string
+          vehicle_number?: string | null
+          vehicle_type: string
+        }
+        Update: {
+          contact_phone?: string
+          created_at?: string
+          duration_hours?: number
+          estimated_arrival_time?: string
+          id?: string
+          parking_space_id?: string
+          payment_method?: string
+          reservation_status?: string
+          special_instructions?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+          vehicle_number?: string | null
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parking_reservations_parking_space_id_fkey"
+            columns: ["parking_space_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parking_spaces: {
         Row: {
+          accepts_cash_on_arrival: boolean | null
           additional_charges: string | null
           amenities: string[] | null
           available_spaces: number | null
@@ -34,6 +94,7 @@ export type Database = {
           vehicle_types: string[] | null
         }
         Insert: {
+          accepts_cash_on_arrival?: boolean | null
           additional_charges?: string | null
           amenities?: string[] | null
           available_spaces?: number | null
@@ -57,6 +118,7 @@ export type Database = {
           vehicle_types?: string[] | null
         }
         Update: {
+          accepts_cash_on_arrival?: boolean | null
           additional_charges?: string | null
           amenities?: string[] | null
           available_spaces?: number | null
