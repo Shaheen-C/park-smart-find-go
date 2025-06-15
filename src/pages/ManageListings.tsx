@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,10 @@ const ManageListings = () => {
   }, [isSignedIn, navigate]);
 
   const fetchListings = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("No user found, cannot fetch listings");
+      return;
+    }
 
     try {
       console.log("Fetching listings for user:", user.id);
@@ -96,6 +100,7 @@ const ManageListings = () => {
 
   const deleteListing = async (id: string) => {
     if (!user) {
+      console.log("No user found for delete operation");
       toast({
         title: "Error",
         description: "You must be logged in to delete listings",
@@ -106,30 +111,53 @@ const ManageListings = () => {
 
     setActionLoading(id);
     try {
-      console.log("Deleting parking space with ID:", id, "for user:", user.id);
+      console.log("Starting delete operation for space:", id, "user:", user.id);
       
-      const { error } = await supabase
+      // First, let's check if the space exists and belongs to the user
+      const { data: existingSpace, error: fetchError } = await supabase
+        .from("parking_spaces")
+        .select("id, user_id, space_name")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching space before delete:", fetchError);
+        throw new Error("Could not find parking space");
+      }
+
+      if (!existingSpace) {
+        throw new Error("Parking space not found");
+      }
+
+      if (existingSpace.user_id !== user.id) {
+        throw new Error("You don't have permission to delete this parking space");
+      }
+
+      console.log("Space found and verified, proceeding with delete:", existingSpace);
+
+      const { error: deleteError } = await supabase
         .from("parking_spaces")
         .delete()
         .eq("id", id)
-        .eq("user_id", user.id); // Ensure user can only delete their own spaces
+        .eq("user_id", user.id);
 
-      if (error) {
-        console.error("Error deleting listing:", error);
-        throw error;
+      if (deleteError) {
+        console.error("Error deleting listing:", deleteError);
+        throw deleteError;
       }
 
+      console.log("Delete successful, updating local state");
       setListings(listings.filter(listing => listing.id !== id));
       toast({
         title: "Success",
         description: "Parking space deleted successfully",
       });
-      console.log("Parking space deleted successfully");
     } catch (error) {
-      console.error("Error deleting listing:", error);
+      console.error("Error in delete operation:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete parking space";
       toast({
         title: "Error",
-        description: "Failed to delete parking space. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -139,6 +167,7 @@ const ManageListings = () => {
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     if (!user) {
+      console.log("No user found for toggle operation");
       toast({
         title: "Error",
         description: "You must be logged in to modify listings",
@@ -149,33 +178,57 @@ const ManageListings = () => {
 
     setActionLoading(id);
     try {
-      console.log("Toggling active status for parking space:", id, "from", currentStatus, "to", !currentStatus);
+      console.log("Starting toggle operation for space:", id, "from", currentStatus, "to", !currentStatus, "user:", user.id);
       
-      const { error } = await supabase
+      // First, let's check if the space exists and belongs to the user
+      const { data: existingSpace, error: fetchError } = await supabase
         .from("parking_spaces")
-        .update({ is_active: !currentStatus })
+        .select("id, user_id, space_name, is_active")
         .eq("id", id)
-        .eq("user_id", user.id); // Ensure user can only update their own spaces
+        .single();
 
-      if (error) {
-        console.error("Error updating listing:", error);
-        throw error;
+      if (fetchError) {
+        console.error("Error fetching space before toggle:", fetchError);
+        throw new Error("Could not find parking space");
       }
 
+      if (!existingSpace) {
+        throw new Error("Parking space not found");
+      }
+
+      if (existingSpace.user_id !== user.id) {
+        throw new Error("You don't have permission to modify this parking space");
+      }
+
+      console.log("Space found and verified, current status:", existingSpace.is_active, "proceeding with toggle");
+
+      const newStatus = !currentStatus;
+      const { error: updateError } = await supabase
+        .from("parking_spaces")
+        .update({ is_active: newStatus })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (updateError) {
+        console.error("Error updating listing:", updateError);
+        throw updateError;
+      }
+
+      console.log("Toggle successful, updating local state");
       setListings(listings.map(listing => 
-        listing.id === id ? { ...listing, is_active: !currentStatus } : listing
+        listing.id === id ? { ...listing, is_active: newStatus } : listing
       ));
       
       toast({
         title: "Success",
-        description: `Parking space ${!currentStatus ? 'activated' : 'deactivated'} successfully`,
+        description: `Parking space ${newStatus ? 'activated' : 'deactivated'} successfully`,
       });
-      console.log("Parking space status updated successfully");
     } catch (error) {
-      console.error("Error updating listing:", error);
+      console.error("Error in toggle operation:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to update parking space status";
       toast({
         title: "Error",
-        description: "Failed to update parking space status. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -237,6 +290,11 @@ const ManageListings = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Manage Your Listings</h1>
           <p className="text-muted-foreground">View and manage your parking spaces</p>
+          {user && (
+            <div className="mt-2 text-sm text-muted-foreground">
+              Logged in as: {user.email} (ID: {user.id})
+            </div>
+          )}
         </div>
 
         {listings.length === 0 ? (
@@ -268,6 +326,9 @@ const ManageListings = () => {
                           <MapPin className="h-4 w-4" />
                           {listing.location}
                         </CardDescription>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Space ID: {listing.id}
                       </div>
                     </div>
                     <div className="flex gap-2">
