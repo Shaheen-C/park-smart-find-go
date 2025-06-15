@@ -31,6 +31,15 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
     return amenities?.slice(0, 3) || [];
   };
 
+  // Add debugging for image URLs
+  console.log("Parking space image URLs:", space.image_urls);
+
+  // Check if we have a valid image URL (not just a filename)
+  const hasValidImage = space.image_urls && 
+    space.image_urls.length > 0 && 
+    space.image_urls[0] && 
+    (space.image_urls[0].startsWith('http') || space.image_urls[0].startsWith('/'));
+
   return (
     <Card>
       <CardHeader>
@@ -53,25 +62,31 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Display actual image if available, otherwise show placeholder */}
+        {/* Display image or placeholder */}
         <div className="mb-4">
-          {space.image_urls && space.image_urls.length > 0 ? (
+          {hasValidImage ? (
             <img
               src={space.image_urls[0]}
               alt={space.space_name}
               className="w-full h-32 object-cover rounded-lg"
               onError={(e) => {
-                // Fallback to placeholder if image fails to load
+                console.log("Image failed to load:", space.image_urls[0]);
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 target.nextElementSibling?.classList.remove('hidden');
               }}
+              onLoad={() => {
+                console.log("Image loaded successfully:", space.image_urls[0]);
+              }}
             />
           ) : null}
-          <div className={`w-full h-32 bg-muted rounded-lg flex items-center justify-center ${space.image_urls && space.image_urls.length > 0 ? 'hidden' : ''}`}>
+          <div className={`w-full h-32 bg-muted rounded-lg flex items-center justify-center ${hasValidImage ? 'hidden' : ''}`}>
             <div className="text-center text-muted-foreground">
               <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
               <p className="text-sm">Parking Space Image</p>
+              {space.image_urls && space.image_urls.length > 0 && (
+                <p className="text-xs mt-1">Image: {space.image_urls[0]}</p>
+              )}
             </div>
           </div>
         </div>
