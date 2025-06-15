@@ -1,14 +1,16 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Users, Car } from "lucide-react";
+import { Edit, Users, Car, MapPin, Clock, Eye, EyeOff, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import EditParkingModal from "@/components/EditParkingModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import BackButton from "@/components/BackButton";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 interface ParkingSpace {
   id: string;
@@ -26,6 +28,7 @@ interface ParkingSpace {
   created_at: string;
   image_urls: string[];
   additional_charges?: string;
+  is_active: boolean;
 }
 
 const ManageListings = () => {
@@ -200,7 +203,7 @@ const ManageListings = () => {
                           <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Inactive</span>
                         )}
                       </CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1">
+                      <CardDescription className="flex items-center gap-1 mt-1 text-foreground font-medium">
                         <MapPin className="h-4 w-4" />
                         {listing.location}
                       </CardDescription>
