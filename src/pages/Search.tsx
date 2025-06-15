@@ -243,7 +243,9 @@ const Search = () => {
                       <Button className="flex-1">
                         Book Now
                       </Button>
-                      <Button variant="outline">View Details</Button>
+                      <Link to={`/parking/${space.id}`}>
+                        <Button variant="outline">View Details</Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

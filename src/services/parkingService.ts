@@ -76,5 +76,26 @@ export const parkingService = {
       console.error("Unexpected error:", error);
       return { data: [], error };
     }
+  },
+
+  async getParkingSpaceById(id: string) {
+    try {
+      const { data, error } = await supabase
+        .from('parking_spaces')
+        .select('*')
+        .eq('id', id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching parking space:", error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      return { data: null, error };
+    }
   }
 };
