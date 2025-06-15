@@ -1,5 +1,3 @@
-
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,26 +31,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/10 border-b border-white/10 shadow-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10 shadow-lg">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <MapPin className="h-8 w-8 text-green-500" />
-            <h1 className="text-2xl font-bold text-foreground">Parkiko</h1>
+            <h1 className="text-2xl font-bold text-white">Parkiko</h1>
           </Link>
           <nav className="hidden md:flex items-center space-x-6">
             <button 
               onClick={handleFindParking}
-              className="text-muted-foreground hover:text-green-500 transition-colors"
+              className="text-white/80 hover:text-green-500 transition-colors"
             >
               Find Parking
             </button>
             <button 
               onClick={handleListSpace}
-              className="text-muted-foreground hover:text-green-500 transition-colors"
+              className="text-white/80 hover:text-green-500 transition-colors"
             >
               List Your Space
             </button>
-            <Link to="/about" className="text-muted-foreground hover:text-green-500 transition-colors">About</Link>
+            <Link to="/about" className="text-white/80 hover:text-green-500 transition-colors">About</Link>
             <ThemeToggle />
             <Button variant="outline" asChild>
               <Link to="/login">Sign In</Link>

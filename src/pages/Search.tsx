@@ -50,12 +50,12 @@ const Search = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="backdrop-blur-xl bg-background/10 shadow-lg border-b border-white/10">
+      <header className="backdrop-blur-xl bg-black/20 shadow-lg border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
               <MapPin className="h-6 w-6 text-green-500" />
-              <h1 className="text-xl font-bold text-foreground">Parkiko</h1>
+              <h1 className="text-xl font-bold text-white">Parkiko</h1>
             </Link>
             <div className="flex items-center space-x-4">
               <ThemeToggle />
