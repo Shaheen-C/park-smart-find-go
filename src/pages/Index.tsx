@@ -6,11 +6,18 @@ import { Search, Calendar, User, MapPin, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const { isSignedIn, setShowSignInModal, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleFindParking = () => {
     if (isSignedIn) {
@@ -40,35 +47,55 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Link to="/" className="hover:opacity-80 transition-opacity">
-                <img src="/lovable-uploads/acd0e8ca-8b97-42ed-beab-ce9c633d5f4e.png" alt="Parkiko Logo" className="h-8 w-auto" />
+                <img
+                  src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png"
+                  alt="Parkiko Logo"
+                  className="h-10 w-auto"
+                  style={{ maxHeight: 40 }} // Adjusted for better layout
+                />
               </Link>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
-              <button 
+              <button
                 onClick={handleFindParking}
                 className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors"
               >
                 Find Parking
               </button>
-              <button 
+              <button
                 onClick={handleListSpace}
                 className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors"
               >
                 List Your Space
               </button>
-              <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">About</Link>
+              <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
+                About
+              </Link>
               <ThemeToggle />
-              
+
               {isSignedIn ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-white/80 dark:text-white/80 light:text-black/80">
-                    Welcome, {user?.user_metadata?.first_name || user?.email}
-                  </span>
-                  <Button variant="outline" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </Button>
-                </div>
+                <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="flex items-center space-x-2 text-white/80 dark:text-white/80 light:text-black/80 font-medium hover:text-green-500 transition-colors cursor-pointer focus:outline-none"
+                      aria-label="User menu"
+                      type="button"
+                    >
+                      <User className="h-5 w-5" />
+                      <span>
+                        {user?.user_metadata?.first_name || user?.email}
+                      </span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="mt-2 min-w-[160px] bg-card text-foreground shadow-lg rounded-lg border">
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="cursor-pointer flex items-center gap-2 text-red-600"
+                    >
+                      <LogOut className="h-4 w-4" /> Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
                   <Button variant="outline" asChild>
@@ -85,7 +112,7 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section 
+      <section
         className="min-h-screen px-4 py-16 text-center relative flex items-center justify-center"
         style={{
           backgroundImage: `url('https://images.pexels.com/photos/2220292/pexels-photo-2220292.jpeg')`,
@@ -103,15 +130,15 @@ const Index = () => {
             </div>
             <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full"></div>
           </div>
-          
+
           <h2 className="text-5xl font-bold text-foreground mb-6">
             Find & Book Parking Spaces Instantly
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Discover secure parking spots near you or monetize your unused parking space. 
+            Discover secure parking spots near you or monetize your unused parking space.
             Perfect for visitors, tourists, and daily commuters across Kerala.
           </p>
-          
+
           {/* Search Bar */}
           <div className="bg-card rounded-lg shadow-lg p-6 max-w-2xl mx-auto border border-border">
             <div className="flex flex-col md:flex-row gap-4">
@@ -201,7 +228,12 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <img src="/lovable-uploads/acd0e8ca-8b97-42ed-beab-ce9c633d5f4e.png" alt="Parkiko Logo" className="h-6 w-auto" />
+                <img
+                  src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png"
+                  alt="Parkiko Logo"
+                  className="h-6 w-auto"
+                  style={{ maxHeight: 24 }}
+                />
               </div>
               <p className="text-muted-foreground">
                 Kerala's premier parking marketplace connecting drivers with secure parking spaces.
