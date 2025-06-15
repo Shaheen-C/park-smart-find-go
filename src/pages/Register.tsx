@@ -5,11 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MapPin, User, Building2, Eye, EyeOff, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import { authService } from "@/services/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const { isSignedIn } = useAuth();
+  
   // Driver form state
   const [driverForm, setDriverForm] = useState({
     firstName: "",
@@ -37,25 +42,59 @@ const Register = () => {
   const [showDriverConfirmPassword, setShowDriverConfirmPassword] = useState(false);
   const [showOwnerPassword, setShowOwnerPassword] = useState(false);
   const [showOwnerConfirmPassword, setShowOwnerConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDriverRegister = (e: React.FormEvent) => {
+  // Redirect if already signed in
+  if (isSignedIn) {
+    navigate('/');
+    return null;
+  }
+
+  const handleDriverRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (driverForm.password !== driverForm.confirmPassword) {
       alert("Passwords don't match");
       return;
     }
-    console.log("Driver registration:", driverForm);
-    // Add registration logic here
+
+    setIsLoading(true);
+    const result = await authService.signUp({
+      email: driverForm.email,
+      password: driverForm.password,
+      firstName: driverForm.firstName,
+      lastName: driverForm.lastName,
+      phone: driverForm.phone,
+      userType: 'driver'
+    });
+
+    setIsLoading(false);
+    if (result.success) {
+      navigate('/login');
+    }
   };
 
-  const handleOwnerRegister = (e: React.FormEvent) => {
+  const handleOwnerRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (ownerForm.password !== ownerForm.confirmPassword) {
       alert("Passwords don't match");
       return;
     }
-    console.log("Owner registration:", ownerForm);
-    // Add registration logic here
+
+    setIsLoading(true);
+    const result = await authService.signUp({
+      email: ownerForm.email,
+      password: ownerForm.password,
+      firstName: ownerForm.firstName,
+      lastName: ownerForm.lastName,
+      phone: ownerForm.phone,
+      businessName: ownerForm.businessName,
+      userType: 'owner'
+    });
+
+    setIsLoading(false);
+    if (result.success) {
+      navigate('/login');
+    }
   };
 
   const updateDriverForm = (field: string, value: string | boolean) => {
@@ -234,9 +273,9 @@ const Register = () => {
                     <Button 
                       type="submit" 
                       className="w-full bg-green-600 hover:bg-green-700" 
-                      disabled={!driverForm.agreeToTerms}
+                      disabled={!driverForm.agreeToTerms || isLoading}
                     >
-                      Create Driver Account
+                      {isLoading ? "Creating Account..." : "Create Driver Account"}
                     </Button>
                   </form>
                 </TabsContent>
@@ -378,9 +417,9 @@ const Register = () => {
                     <Button 
                       type="submit" 
                       className="w-full bg-green-600 hover:bg-green-700" 
-                      disabled={!ownerForm.agreeToTerms}
+                      disabled={!ownerForm.agreeToTerms || isLoading}
                     >
-                      Create Owner Account
+                      {isLoading ? "Creating Account..." : "Create Owner Account"}
                     </Button>
                   </form>
                 </TabsContent>

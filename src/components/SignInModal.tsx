@@ -7,26 +7,46 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Building2, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { authService } from "@/services/auth";
 
 const SignInModal = () => {
-  const { showSignInModal, setShowSignInModal, signIn } = useAuth();
+  const { showSignInModal, setShowSignInModal } = useAuth();
   const [driverEmail, setDriverEmail] = useState("");
   const [driverPassword, setDriverPassword] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
   const [ownerPassword, setOwnerPassword] = useState("");
   const [showDriverPassword, setShowDriverPassword] = useState(false);
   const [showOwnerPassword, setShowOwnerPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDriverSignIn = (e: React.FormEvent) => {
+  const handleDriverSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Driver sign in:", { email: driverEmail, password: driverPassword });
-    signIn(); // This will close the modal and mark user as signed in
+    setIsLoading(true);
+    
+    const result = await authService.signIn({
+      email: driverEmail,
+      password: driverPassword
+    });
+
+    setIsLoading(false);
+    if (result.success) {
+      setShowSignInModal(false);
+    }
   };
 
-  const handleOwnerSignIn = (e: React.FormEvent) => {
+  const handleOwnerSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Owner sign in:", { email: ownerEmail, password: ownerPassword });
-    signIn(); // This will close the modal and mark user as signed in
+    setIsLoading(true);
+    
+    const result = await authService.signIn({
+      email: ownerEmail,
+      password: ownerPassword
+    });
+
+    setIsLoading(false);
+    if (result.success) {
+      setShowSignInModal(false);
+    }
   };
 
   return (
@@ -85,8 +105,12 @@ const SignInModal = () => {
                   </button>
                 </div>
               </div>
-              <Button type="submit" className="w-full">
-                Sign In as Driver
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing In..." : "Sign In as Driver"}
               </Button>
             </form>
           </TabsContent>
@@ -128,8 +152,12 @@ const SignInModal = () => {
                   </button>
                 </div>
               </div>
-              <Button type="submit" className="w-full">
-                Sign In as Owner
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing In..." : "Sign In as Owner"}
               </Button>
             </form>
           </TabsContent>
