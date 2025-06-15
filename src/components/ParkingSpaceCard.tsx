@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,9 +41,15 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
     }
   };
 
-  const handleLocationClick = () => {
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Location clicked:', space.location);
+    
     // Create Google Maps URL for directions
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(space.location)}`;
+    console.log('Opening Google Maps URL:', googleMapsUrl);
+    
     window.open(googleMapsUrl, '_blank');
   };
 
@@ -60,11 +65,12 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
           </Badge>
         </div>
         <div 
-          className="flex items-center gap-2 text-green-600 hover:text-green-700 cursor-pointer transition-colors p-1 rounded hover:bg-green-50"
+          className="flex items-center gap-2 text-green-600 hover:text-green-700 cursor-pointer transition-colors p-2 rounded hover:bg-green-50 border border-transparent hover:border-green-200"
           onClick={handleLocationClick}
           title="Click to get directions"
+          style={{ userSelect: 'none' }}
         >
-          <MapPin className="h-4 w-4" />
+          <MapPin className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm text-muted-foreground">{space.location}</span>
         </div>
       </CardHeader>
