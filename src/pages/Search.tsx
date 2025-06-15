@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
@@ -26,8 +27,9 @@ interface ParkingSpace {
 
 const Search = () => {
   const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [parkingSpaces, setParkingSpaces] = useState<ParkingSpace[]>([]);
   const [loading, setLoading] = useState(true);
   const [filteredSpaces, setFilteredSpaces] = useState<ParkingSpace[]>([]);
@@ -38,17 +40,8 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    // Filter parking spaces based on location search
-    if (location.trim()) {
-      const filtered = parkingSpaces.filter(space =>
-        space.location.toLowerCase().includes(location.toLowerCase()) ||
-        space.space_name.toLowerCase().includes(location.toLowerCase())
-      );
-      setFilteredSpaces(filtered);
-    } else {
-      setFilteredSpaces(parkingSpaces);
-    }
-  }, [location, parkingSpaces]);
+    applyFilters();
+  }, [location, availability, priceRange, selectedAmenities, parkingSpaces]);
 
   const loadParkingSpaces = async () => {
     setLoading(true);
@@ -76,11 +69,71 @@ const Search = () => {
     }
   };
 
+  const getAvailabilityStatus = (space: ParkingSpace) => {
+    const available = space.available_spaces || 0;
+    if (available === 0) {
+      return "full";
+    } else if (available <= space.capacity * 0.3) {
+      return "limited";
+    } else {
+      return "available";
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = parkingSpaces;
+
+    // Location filter
+    if (location.trim()) {
+      filtered = filtered.filter(space =>
+        space.location.toLowerCase().includes(location.toLowerCase()) ||
+        space.space_name.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    // Availability filter
+    if (availability && availability !== "all") {
+      filtered = filtered.filter(space => {
+        const status = getAvailabilityStatus(space);
+        return status === availability;
+      });
+    }
+
+    // Price range filter
+    filtered = filtered.filter(space =>
+      space.price_per_hour >= priceRange[0] && space.price_per_hour <= priceRange[1]
+    );
+
+    // Amenities filter
+    if (selectedAmenities.length > 0) {
+      filtered = filtered.filter(space =>
+        selectedAmenities.every(amenity =>
+          space.amenities?.includes(amenity)
+        )
+      );
+    }
+
+    setFilteredSpaces(filtered);
+  };
+
   const handleSearch = () => {
-    console.log("Search clicked with:", { location, date, time });
+    console.log("Search clicked with filters:", {
+      location,
+      availability,
+      priceRange,
+      selectedAmenities
+    });
+    
+    const filterCount = [
+      location ? 1 : 0,
+      availability && availability !== "all" ? 1 : 0,
+      priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0,
+      selectedAmenities.length > 0 ? 1 : 0
+    ].reduce((a, b) => a + b, 0);
+
     toast({
-      title: "Search functionality",
-      description: `Searching for parking in: ${location || 'all locations'}`
+      title: "Filters applied",
+      description: `Found ${filteredSpaces.length} parking spaces with ${filterCount} active filters`
     });
   };
 
@@ -109,10 +162,12 @@ const Search = () => {
           <SearchFilters
             location={location}
             setLocation={setLocation}
-            date={date}
-            setDate={setDate}
-            time={time}
-            setTime={setTime}
+            availability={availability}
+            setAvailability={setAvailability}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            selectedAmenities={selectedAmenities}
+            setSelectedAmenities={setSelectedAmenities}
             onSearch={handleSearch}
           />
         </div>
