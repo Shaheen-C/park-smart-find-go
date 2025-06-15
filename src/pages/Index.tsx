@@ -33,10 +33,10 @@ const Index = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/30 border-b border-border/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <MapPin className="h-8 w-8 text-green-500" />
             <h1 className="text-2xl font-bold text-foreground">Parkiko</h1>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center space-x-6">
             <button 
               onClick={handleFindParking}
