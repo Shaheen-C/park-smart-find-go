@@ -31,14 +31,11 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
     return amenities?.slice(0, 3) || [];
   };
 
-  // Add debugging for image URLs
-  console.log("Parking space image URLs:", space.image_urls);
-
-  // Check if we have a valid image URL (not just a filename)
+  // Check if we have a valid image URL
   const hasValidImage = space.image_urls && 
     space.image_urls.length > 0 && 
     space.image_urls[0] && 
-    (space.image_urls[0].startsWith('http') || space.image_urls[0].startsWith('/'));
+    space.image_urls[0].startsWith('http');
 
   return (
     <Card>
@@ -75,20 +72,23 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
                 target.style.display = 'none';
                 target.nextElementSibling?.classList.remove('hidden');
               }}
-              onLoad={() => {
-                console.log("Image loaded successfully:", space.image_urls[0]);
-              }}
             />
-          ) : null}
-          <div className={`w-full h-32 bg-muted rounded-lg flex items-center justify-center ${hasValidImage ? 'hidden' : ''}`}>
-            <div className="text-center text-muted-foreground">
-              <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
-              <p className="text-sm">Parking Space Image</p>
-              {space.image_urls && space.image_urls.length > 0 && (
-                <p className="text-xs mt-1">Image: {space.image_urls[0]}</p>
-              )}
+          ) : (
+            <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
+                <p className="text-sm">No Image Available</p>
+              </div>
             </div>
-          </div>
+          )}
+          {hasValidImage && (
+            <div className="hidden w-full h-32 bg-muted rounded-lg flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
+                <p className="text-sm">Image Failed to Load</p>
+              </div>
+            </div>
+          )}
         </div>
         
         <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
