@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -79,6 +78,21 @@ const ParkingDetails = () => {
     } else {
       return { text: "Available", color: "text-green-500" };
     }
+  };
+
+  const handleMapClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!parkingSpace) return;
+    
+    console.log('Map clicked for location:', parkingSpace.location);
+    
+    // Create Google Maps URL for directions
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(parkingSpace.location)}`;
+    console.log('Opening Google Maps URL:', googleMapsUrl);
+    
+    window.open(googleMapsUrl, '_blank');
   };
 
   if (loading) {
@@ -308,10 +322,15 @@ const ParkingDetails = () => {
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-muted h-64 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-muted-foreground">
+                <div 
+                  className="bg-muted h-64 rounded-lg flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors border border-transparent hover:border-green-200"
+                  onClick={handleMapClick}
+                  title="Click to get directions"
+                  style={{ userSelect: 'none' }}
+                >
+                  <div className="text-center text-muted-foreground hover:text-green-600 transition-colors">
                     <MapPin className="h-12 w-12 mx-auto mb-2 text-green-500" />
-                    <p className="text-foreground">Interactive Map</p>
+                    <p className="text-foreground">Click for Directions</p>
                     <p className="text-sm">Location: {parkingSpace.location}</p>
                   </div>
                 </div>
