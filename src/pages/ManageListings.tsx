@@ -5,6 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Users, Car, MapPin, Clock, Eye, EyeOff, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import EditParkingModal from "@/components/EditParkingModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import BackButton from "@/components/BackButton";
@@ -35,6 +46,7 @@ const ManageListings = () => {
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedSpace, setSelectedSpace] = useState<ParkingSpace | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { user, isSignedIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,13 +63,19 @@ const ManageListings = () => {
     if (!user) return;
 
     try {
+      console.log("Fetching listings for user:", user.id);
       const { data, error } = await supabase
         .from("parking_spaces")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching listings:", error);
+        throw error;
+      }
+      
+      console.log("Fetched listings:", data);
       setListings((data || []).map(item => ({
         ...item,
         vehicle_counts: typeof item.vehicle_counts === 'object' && item.vehicle_counts !== null 
@@ -77,37 +95,72 @@ const ManageListings = () => {
   };
 
   const deleteListing = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete listings",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setActionLoading(id);
     try {
+      console.log("Deleting parking space with ID:", id, "for user:", user.id);
+      
       const { error } = await supabase
         .from("parking_spaces")
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .eq("user_id", user.id); // Ensure user can only delete their own spaces
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting listing:", error);
+        throw error;
+      }
 
       setListings(listings.filter(listing => listing.id !== id));
       toast({
         title: "Success",
         description: "Parking space deleted successfully",
       });
+      console.log("Parking space deleted successfully");
     } catch (error) {
       console.error("Error deleting listing:", error);
       toast({
         title: "Error",
-        description: "Failed to delete parking space",
+        description: "Failed to delete parking space. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to modify listings",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setActionLoading(id);
     try {
+      console.log("Toggling active status for parking space:", id, "from", currentStatus, "to", !currentStatus);
+      
       const { error } = await supabase
         .from("parking_spaces")
         .update({ is_active: !currentStatus })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("user_id", user.id); // Ensure user can only update their own spaces
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating listing:", error);
+        throw error;
+      }
 
       setListings(listings.map(listing => 
         listing.id === id ? { ...listing, is_active: !currentStatus } : listing
@@ -117,13 +170,16 @@ const ManageListings = () => {
         title: "Success",
         description: `Parking space ${!currentStatus ? 'activated' : 'deactivated'} successfully`,
       });
+      console.log("Parking space status updated successfully");
     } catch (error) {
       console.error("Error updating listing:", error);
       toast({
         title: "Error",
-        description: "Failed to update parking space status",
+        description: "Failed to update parking space status. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -219,6 +275,7 @@ const ManageListings = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditClick(listing)}
+                        disabled={actionLoading === listing.id}
                       >
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
@@ -227,8 +284,11 @@ const ManageListings = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => toggleActive(listing.id, listing.is_active)}
+                        disabled={actionLoading === listing.id}
                       >
-                        {listing.is_active ? (
+                        {actionLoading === listing.id ? (
+                          "Processing..."
+                        ) : listing.is_active ? (
                           <>
                             <EyeOff className="h-4 w-4 mr-1" />
                             Deactivate
@@ -240,18 +300,36 @@ const ManageListings = () => {
                           </>
                         )}
                       </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          if (confirm("Are you sure you want to delete this listing? This action cannot be undone.")) {
-                            deleteListing(listing.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={actionLoading === listing.id}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your
+                              parking space listing "{listing.space_name}".
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteListing(listing.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardHeader>
