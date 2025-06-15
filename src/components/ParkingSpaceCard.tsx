@@ -42,9 +42,7 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
     }
   };
 
-  const handleLocationClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleLocationClick = () => {
     // Create Google Maps URL for directions
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(space.location)}`;
     window.open(googleMapsUrl, '_blank');
@@ -61,14 +59,14 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
             {availabilityStatus.text}
           </Badge>
         </div>
-        <CardDescription 
-          className="flex items-center gap-2 text-green-600 hover:text-green-700 cursor-pointer transition-colors"
+        <div 
+          className="flex items-center gap-2 text-green-600 hover:text-green-700 cursor-pointer transition-colors p-1 rounded hover:bg-green-50"
           onClick={handleLocationClick}
           title="Click to get directions"
         >
           <MapPin className="h-4 w-4" />
-          {space.location}
-        </CardDescription>
+          <span className="text-sm text-muted-foreground">{space.location}</span>
+        </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-3">
