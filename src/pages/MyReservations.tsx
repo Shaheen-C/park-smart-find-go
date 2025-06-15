@@ -110,10 +110,10 @@ const MyReservations = () => {
         <BackButton />
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">My Reservations</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">My Reservations</h1>
           <p className="text-muted-foreground">View and manage your parking reservations</p>
           {user && (
-            <div className="mt-2 text-sm text-muted-foreground">
+            <div className="mt-2 text-sm text-muted-foreground break-all">
               Logged in as: {user.email} (ID: {user.id})
             </div>
           )}
@@ -123,7 +123,7 @@ const MyReservations = () => {
           <Card>
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground mb-4">You haven't made any reservations yet.</p>
-              <Button onClick={() => navigate("/search")}>
+              <Button onClick={() => navigate("/search")} className="w-full sm:w-auto">
                 Find Parking Spaces
               </Button>
             </CardContent>

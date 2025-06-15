@@ -65,25 +65,25 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
   return (
     <Card className={reservation.reservation_status === 'cancelled' ? "opacity-60" : ""}>
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              {reservation.parking_spaces.space_name}
-              <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(reservation.reservation_status)}`}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          <div className="flex-1">
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <span className="break-words">{reservation.parking_spaces.space_name}</span>
+              <span className={`text-xs px-2 py-1 rounded-full w-fit ${getStatusColor(reservation.reservation_status)}`}>
                 {reservation.reservation_status.charAt(0).toUpperCase() + reservation.reservation_status.slice(1)}
               </span>
             </CardTitle>
             <div className="bg-gray-800 dark:bg-gray-700 rounded-lg px-3 py-2 mt-2 w-fit">
               <CardDescription className="flex items-center gap-1 text-white font-medium">
-                <MapPin className="h-4 w-4" />
-                {reservation.parking_spaces.location}
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span className="break-words">{reservation.parking_spaces.location}</span>
               </CardDescription>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
+            <div className="text-xs text-muted-foreground mt-1 break-all">
               Reservation ID: {reservation.id}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {canCancel && isUpcoming && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -91,12 +91,13 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
                     variant="destructive"
                     size="sm"
                     disabled={actionLoading === reservation.id}
+                    className="w-full sm:w-auto"
                   >
                     <X className="h-4 w-4 mr-1" />
                     Cancel
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="mx-4 max-w-md">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -104,11 +105,11 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
                       This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
+                  <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                    <AlertDialogCancel className="w-full sm:w-auto">Keep Reservation</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onCancel(reservation.id)}
-                      className="bg-red-600 hover:bg-red-700"
+                      className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                     >
                       Cancel Reservation
                     </AlertDialogAction>
@@ -123,13 +124,13 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
                     variant="outline"
                     size="sm"
                     disabled={actionLoading === reservation.id}
-                    className="border-red-200 text-red-600 hover:bg-red-50"
+                    className="border-red-200 text-red-600 hover:bg-red-50 w-full sm:w-auto"
                   >
                     <X className="h-4 w-4 mr-1" />
                     Delete
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="mx-4 max-w-md">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Cancelled Reservation</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -137,11 +138,11 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
                       This action cannot be undone and will remove it from your history.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Keep</AlertDialogCancel>
+                  <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                    <AlertDialogCancel className="w-full sm:w-auto">Keep</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onDelete(reservation.id)}
-                      className="bg-red-600 hover:bg-red-700"
+                      className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                     >
                       Delete Permanently
                     </AlertDialogAction>
@@ -153,33 +154,33 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               <span className="text-sm">
                 {arrivalDate.toLocaleDateString()} at {arrivalDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               <span className="text-sm">{reservation.duration_hours} hour{reservation.duration_hours > 1 ? 's' : ''}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">
+              <Car className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm break-words">
                 {reservation.vehicle_type} {reservation.vehicle_number && `(${reservation.vehicle_number})`}
               </span>
             </div>
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{reservation.contact_phone}</span>
+              <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm break-all">{reservation.contact_phone}</span>
             </div>
             <div className="text-sm">
               <span className="font-medium">Total: ₹{reservation.total_amount}</span>
-              <span className="text-muted-foreground ml-2">({reservation.payment_method})</span>
+              <span className="text-muted-foreground ml-2">({reservation.payment_method.replace('_', ' ')})</span>
             </div>
             <div className="text-xs text-muted-foreground">
               Booked: {new Date(reservation.created_at).toLocaleDateString()}
@@ -189,7 +190,7 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
         
         {reservation.special_instructions && (
           <div className="mt-3 p-3 bg-muted rounded-lg">
-            <p className="text-sm">
+            <p className="text-sm break-words">
               <span className="font-medium">Special Instructions:</span> {reservation.special_instructions}
             </p>
           </div>
