@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Calendar, User, MapPin, LogOut, Settings } from "lucide-react";
+import { Search, Calendar, User, MapPin, LogOut, Settings, CreditCard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -70,6 +70,9 @@ const Index = () => {
               </button>
               <Link to="/nearby-facilities" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
                 Nearby Facilities
+              </Link>
+              <Link to="/fastag-recharge" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
+                FASTag Recharge
               </Link>
               <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
                 About
@@ -176,7 +179,7 @@ const Index = () => {
           <p className="text-lg text-muted-foreground">The smartest way to find and book parking in Kerala</p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-4 gap-8">
           <Card className="text-center">
             <CardHeader>
               <Search className="h-12 w-12 text-green-500 mx-auto mb-4" />
@@ -212,6 +215,18 @@ const Index = () => {
               </p>
             </CardContent>
           </Card>
+
+          <Card className="text-center">
+            <CardHeader>
+              <CreditCard className="h-12 w-12 text-green-500 mx-auto mb-4" />
+              <CardTitle>FASTag Recharge</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Quick and convenient FASTag recharge for seamless toll payments across Kerala highways.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -226,6 +241,9 @@ const Index = () => {
             </Button>
             <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white border-green-600" onClick={handleListSpace}>
               List Your Space
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/fastag-recharge">Recharge FASTag</Link>
             </Button>
           </div>
         </div>
