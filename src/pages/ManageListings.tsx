@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,12 @@ const ManageListings = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setListings(data || []);
+      setListings((data || []).map(item => ({
+        ...item,
+        vehicle_counts: typeof item.vehicle_counts === 'object' && item.vehicle_counts !== null 
+          ? item.vehicle_counts as { [key: string]: number }
+          : {}
+      })));
     } catch (error) {
       console.error("Error fetching listings:", error);
       toast({
@@ -203,10 +207,12 @@ const ManageListings = () => {
                           <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Inactive</span>
                         )}
                       </CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1 text-foreground font-medium">
-                        <MapPin className="h-4 w-4" />
-                        {listing.location}
-                      </CardDescription>
+                      <div className="bg-gray-800 dark:bg-gray-700 rounded-lg px-3 py-2 mt-2 w-fit">
+                        <CardDescription className="flex items-center gap-1 text-white font-medium">
+                          <MapPin className="h-4 w-4" />
+                          {listing.location}
+                        </CardDescription>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Button
