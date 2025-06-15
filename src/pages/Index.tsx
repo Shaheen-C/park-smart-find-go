@@ -50,8 +50,7 @@ const Index = () => {
                 <img
                   src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png"
                   alt="Parkiko Logo"
-                  className="h-10 w-auto"
-                  style={{ maxHeight: 40 }} // Adjusted for better layout
+                  className="h-8 w-auto"
                 />
               </Link>
             </div>
@@ -231,8 +230,7 @@ const Index = () => {
                 <img
                   src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png"
                   alt="Parkiko Logo"
-                  className="h-6 w-auto"
-                  style={{ maxHeight: 24 }}
+                  className="h-8 w-auto"
                 />
               </div>
               <p className="text-muted-foreground">
