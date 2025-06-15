@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
@@ -106,25 +105,40 @@ const Search = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Filters */}
-        <SearchFilters
-          location={location}
-          setLocation={setLocation}
-          date={date}
-          setDate={setDate}
-          time={time}
-          setTime={setTime}
-          onSearch={handleSearch}
-        />
+        <div className="mb-8">
+          <SearchFilters
+            location={location}
+            setLocation={setLocation}
+            date={date}
+            setDate={setDate}
+            time={time}
+            setTime={setTime}
+            onSearch={handleSearch}
+          />
+        </div>
 
         {/* Results */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ParkingSpacesList
-            loading={loading}
-            filteredSpaces={filteredSpaces}
-            parkingSpaces={parkingSpaces}
-            onRefresh={loadParkingSpaces}
-          />
-          <MapPlaceholder />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <ParkingSpacesList
+              loading={loading}
+              filteredSpaces={filteredSpaces}
+              parkingSpaces={parkingSpaces}
+              onRefresh={loadParkingSpaces}
+            />
+          </div>
+          <div>
+            <MapPlaceholder 
+              location={filteredSpaces.length > 0 ? filteredSpaces[0].location : undefined}
+              onClick={() => {
+                if (filteredSpaces.length > 0) {
+                  const location = filteredSpaces[0].location;
+                  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location)}`;
+                  window.open(googleMapsUrl, '_blank');
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
