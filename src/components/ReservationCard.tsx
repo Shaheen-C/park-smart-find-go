@@ -37,10 +37,11 @@ interface Reservation {
 interface ReservationCardProps {
   reservation: Reservation;
   onCancel: (id: string) => void;
+  onDelete?: (id: string) => void;
   actionLoading: string | null;
 }
 
-const ReservationCard = ({ reservation, onCancel, actionLoading }: ReservationCardProps) => {
+const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: ReservationCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -57,6 +58,7 @@ const ReservationCard = ({ reservation, onCancel, actionLoading }: ReservationCa
   };
 
   const canCancel = reservation.reservation_status === 'confirmed' || reservation.reservation_status === 'pending';
+  const canDelete = reservation.reservation_status === 'cancelled';
   const arrivalDate = new Date(reservation.estimated_arrival_time);
   const isUpcoming = arrivalDate > new Date();
 
@@ -81,38 +83,73 @@ const ReservationCard = ({ reservation, onCancel, actionLoading }: ReservationCa
               Reservation ID: {reservation.id}
             </div>
           </div>
-          {canCancel && isUpcoming && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={actionLoading === reservation.id}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to cancel this reservation for "{reservation.parking_spaces.space_name}"? 
-                    This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onCancel(reservation.id)}
-                    className="bg-red-600 hover:bg-red-700"
+          <div className="flex gap-2">
+            {canCancel && isUpcoming && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={actionLoading === reservation.id}
                   >
-                    Cancel Reservation
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to cancel this reservation for "{reservation.parking_spaces.space_name}"? 
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onCancel(reservation.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Cancel Reservation
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            {canDelete && onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={actionLoading === reservation.id}
+                    className="border-red-200 text-red-600 hover:bg-red-50"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Cancelled Reservation</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to permanently delete this cancelled reservation for "{reservation.parking_spaces.space_name}"? 
+                      This action cannot be undone and will remove it from your history.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Keep</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onDelete(reservation.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Delete Permanently
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

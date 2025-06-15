@@ -36,7 +36,7 @@ const MyReservations = () => {
   const { user, isSignedIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { actionLoading, cancelReservation } = useReservationActions();
+  const { actionLoading, cancelReservation, deleteReservation } = useReservationActions();
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -89,6 +89,10 @@ const MyReservations = () => {
     cancelReservation(id, reservations, setReservations);
   };
 
+  const handleDelete = (id: string) => {
+    deleteReservation(id, reservations, setReservations);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -131,6 +135,7 @@ const MyReservations = () => {
                 key={reservation.id}
                 reservation={reservation}
                 onCancel={handleCancel}
+                onDelete={handleDelete}
                 actionLoading={actionLoading}
               />
             ))}

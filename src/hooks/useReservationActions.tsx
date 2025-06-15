@@ -90,8 +90,59 @@ export const useReservationActions = () => {
     }
   };
 
+  const deleteReservation = async (
+    id: string, 
+    reservations: Reservation[], 
+    setReservations: (reservations: Reservation[]) => void
+  ) => {
+    if (!user) {
+      console.log("No user found for delete operation");
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete reservations",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setActionLoading(id);
+    try {
+      console.log("Starting delete operation for reservation:", id, "user:", user.id);
+      
+      const { error: deleteError } = await supabase
+        .from("parking_reservations")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (deleteError) {
+        console.error("Error deleting reservation:", deleteError);
+        throw deleteError;
+      }
+
+      console.log("Delete successful, updating local state");
+      setReservations(reservations.filter(reservation => reservation.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Reservation deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error in delete operation:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete reservation";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   return {
     actionLoading,
     cancelReservation,
+    deleteReservation,
   };
 };
