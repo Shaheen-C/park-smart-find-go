@@ -16,6 +16,7 @@ import Register from "./pages/Register";
 import ManageListings from "./pages/ManageListings";
 import NearbyFacilitiesPage from "./pages/NearbyFacilities";
 import FastagRecharge from "./pages/FastagRecharge";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/manage-listings" element={<ManageListings />} />
               <Route path="/nearby-facilities" element={<NearbyFacilitiesPage />} />
               <Route path="/fastag-recharge" element={<FastagRecharge />} />
+              <Route path="/about" element={<About />} />
               <Route path="/parking/:id" element={<ParkingDetails />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/register" element={<Register />} />
