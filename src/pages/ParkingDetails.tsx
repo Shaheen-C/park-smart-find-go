@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Phone, Mail, Car, Clock, Users, Truck, Bike } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import BookingModal from "@/components/BookingModal";
 import { parkingService } from "@/services/parkingService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,6 +32,7 @@ const ParkingDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [parkingSpace, setParkingSpace] = useState<ParkingSpace | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -239,6 +241,7 @@ const ParkingDetails = () => {
                 <Button 
                   className="w-full bg-green-600 hover:bg-green-700"
                   disabled={parkingSpace.available_spaces === 0}
+                  onClick={() => setBookingModalOpen(true)}
                 >
                   {parkingSpace.available_spaces === 0 ? "Fully Booked" : "Book Now"}
                 </Button>
@@ -384,6 +387,12 @@ const ParkingDetails = () => {
           </div>
         </div>
       </div>
+
+      <BookingModal
+        open={bookingModalOpen}
+        onOpenChange={setBookingModalOpen}
+        parkingSpace={parkingSpace}
+      />
     </div>
   );
 };

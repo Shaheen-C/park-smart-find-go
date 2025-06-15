@@ -117,8 +117,6 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
   };
 
   const today = new Date().toISOString().split('T')[0];
-  const now = new Date();
-  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
