@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const form = useForm({
@@ -50,8 +51,10 @@ const ListSpace = () => {
   ];
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Image upload triggered");
     const files = event.target.files;
-    if (files) {
+    if (files && files.length > 0) {
+      console.log("Files selected:", files.length);
       const newImages = Array.from(files);
       
       // Validate file types
@@ -59,6 +62,7 @@ const ListSpace = () => {
       const invalidFiles = newImages.filter(file => !validTypes.includes(file.type));
       
       if (invalidFiles.length > 0) {
+        console.log("Invalid file types found:", invalidFiles);
         toast({
           title: "Invalid file type",
           description: "Please upload only JPG or PNG images.",
@@ -71,6 +75,7 @@ const ListSpace = () => {
       const oversizedFiles = newImages.filter(file => file.size > 10 * 1024 * 1024);
       
       if (oversizedFiles.length > 0) {
+        console.log("Oversized files found:", oversizedFiles);
         toast({
           title: "File too large",
           description: "Each image must be under 10MB.",
@@ -79,56 +84,77 @@ const ListSpace = () => {
         return;
       }
 
-      setUploadedImages(prev => [...prev, ...newImages]);
+      console.log("Adding images to state:", newImages.length);
+      setUploadedImages(prev => {
+        const updated = [...prev, ...newImages];
+        console.log("Total images after upload:", updated.length);
+        return updated;
+      });
+      
       toast({
         title: "Images uploaded",
         description: `${newImages.length} image(s) added successfully.`
       });
+    } else {
+      console.log("No files selected");
     }
+    
+    // Reset the input value so the same file can be selected again if needed
+    event.target.value = '';
   };
 
   const removeImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    console.log("Removing image at index:", index);
+    setUploadedImages(prev => {
+      const updated = prev.filter((_, i) => i !== index);
+      console.log("Images after removal:", updated.length);
+      return updated;
+    });
+    toast({
+      title: "Image removed",
+      description: "Image has been removed from your listing."
+    });
   };
 
   const onSubmit = async (data: any) => {
-    console.log("Form submitted:", data);
-    console.log("Uploaded images:", uploadedImages);
+    console.log("Form submission started");
+    console.log("Form data:", data);
+    console.log("Uploaded images:", uploadedImages.length);
     
-    // Validate minimum images for step 3
-    if (currentStep === 4 && uploadedImages.length < 3) {
-      toast({
-        title: "Minimum images required",
-        description: "Please upload at least 3 photos of your parking space.",
-        variant: "destructive"
-      });
-      setCurrentStep(3);
-      return;
-    }
-
+    setIsSubmitting(true);
+    
     try {
-      // Here you would typically upload to your backend/storage
-      // For now, we'll just show a success message
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Here you would typically upload images and form data to your backend
+      console.log("Processing form submission...");
+      
       toast({
         title: "Listing submitted successfully!",
         description: "Your parking space will be reviewed and published soon."
       });
       
-      // Reset form
+      // Reset form and images
       form.reset();
       setUploadedImages([]);
       setCurrentStep(1);
       
     } catch (error) {
+      console.error("Form submission error:", error);
       toast({
         title: "Submission failed",
         description: "There was an error submitting your listing. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleNext = () => {
+    console.log("Moving to next step from:", currentStep);
+    
     // Basic validation before moving to next step
     if (currentStep === 1) {
       const { spaceName, location, description } = form.getValues();
@@ -176,6 +202,14 @@ const ListSpace = () => {
     }
 
     setCurrentStep(Math.min(steps.length, currentStep + 1));
+  };
+
+  const handleFileInputClick = () => {
+    console.log("File input clicked");
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   };
 
   return (
@@ -294,7 +328,6 @@ const ListSpace = () => {
                   </div>
                 )}
 
-                {/* Step 2: Pricing & Capacity */}
                 {currentStep === 2 && (
                   <div className="space-y-4">
                     <FormField
@@ -383,7 +416,7 @@ const ListSpace = () => {
                   </div>
                 )}
 
-                {/* Step 3: Amenities */}
+                {/* Step 3: Amenities with improved image upload */}
                 {currentStep === 3 && (
                   <div className="space-y-4">
                     <div>
@@ -417,7 +450,10 @@ const ListSpace = () => {
 
                     <div>
                       <h3 className="text-lg font-medium mb-4">Upload Photos *</h3>
-                      <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
+                      <div 
+                        className="border-2 border-dashed border-muted rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                        onClick={handleFileInputClick}
+                      >
                         <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground">Click to upload photos of your parking space</p>
                         <p className="text-sm text-muted-foreground mt-2">JPG, PNG up to 10MB each. Minimum 3 photos required.</p>
@@ -429,11 +465,9 @@ const ListSpace = () => {
                           className="hidden"
                           id="image-upload"
                         />
-                        <label htmlFor="image-upload">
-                          <Button variant="outline" className="mt-4" type="button">
-                            Choose Files
-                          </Button>
-                        </label>
+                        <Button variant="outline" className="mt-4" type="button" onClick={handleFileInputClick}>
+                          Choose Files
+                        </Button>
                       </div>
                       
                       {uploadedImages.length > 0 && (
@@ -541,8 +575,8 @@ const ListSpace = () => {
                       Next
                     </Button>
                   ) : (
-                    <Button type="submit">
-                      Submit Listing
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Submitting..." : "Submit Listing"}
                     </Button>
                   )}
                 </div>
