@@ -18,8 +18,10 @@ export type Database = {
           id: string
           parking_space_id: string
           payment_method: string
+          payment_status: string | null
           reservation_status: string
           special_instructions: string | null
+          stripe_payment_intent_id: string | null
           total_amount: number
           updated_at: string
           user_id: string
@@ -34,8 +36,10 @@ export type Database = {
           id?: string
           parking_space_id: string
           payment_method: string
+          payment_status?: string | null
           reservation_status?: string
           special_instructions?: string | null
+          stripe_payment_intent_id?: string | null
           total_amount: number
           updated_at?: string
           user_id: string
@@ -50,8 +54,10 @@ export type Database = {
           id?: string
           parking_space_id?: string
           payment_method?: string
+          payment_status?: string | null
           reservation_status?: string
           special_instructions?: string | null
+          stripe_payment_intent_id?: string | null
           total_amount?: number
           updated_at?: string
           user_id?: string
