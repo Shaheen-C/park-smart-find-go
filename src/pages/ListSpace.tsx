@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,16 +50,16 @@ const ListSpace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link to="/" className="hover:opacity-80 transition-opacity">
                 <img src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png" alt="Parkiko Logo" className="h-8 w-auto" />
               </Link>
-              <span className="text-gray-500">• List Your Space</span>
+              <span className="text-muted-foreground">• List Your Space</span>
             </div>
             <div className="flex items-center space-x-4">
               <ThemeToggle />
@@ -77,8 +78,8 @@ const ListSpace = () => {
                 <div className={`
                   flex items-center justify-center w-10 h-10 rounded-full border-2 
                   ${currentStep >= step.number 
-                    ? 'bg-blue-600 border-blue-600 text-white' 
-                    : 'border-gray-300 text-gray-400'
+                    ? 'bg-primary border-primary text-primary-foreground' 
+                    : 'border-muted-foreground text-muted-foreground'
                   }
                 `}>
                   {currentStep > step.number ? (
@@ -90,15 +91,15 @@ const ListSpace = () => {
                 {step.number < steps.length && (
                   <div className={`
                     w-24 h-0.5 mx-4 
-                    ${currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'}
+                    ${currentStep > step.number ? 'bg-primary' : 'bg-muted'}
                   `} />
                 )}
               </div>
             ))}
           </div>
           <div className="mt-4 text-center">
-            <h2 className="text-2xl font-bold text-gray-900">{steps[currentStep - 1].title}</h2>
-            <p className="text-gray-600">{steps[currentStep - 1].description}</p>
+            <h2 className="text-2xl font-bold text-foreground">{steps[currentStep - 1].title}</h2>
+            <p className="text-muted-foreground">{steps[currentStep - 1].description}</p>
           </div>
         </div>
 
@@ -216,7 +217,7 @@ const ListSpace = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Additional Charges</label>
                         <Input placeholder="Overnight parking: ₹200" />
-                        <p className="text-xs text-gray-500 mt-1">Optional extra charges</p>
+                        <p className="text-xs text-muted-foreground mt-1">Optional extra charges</p>
                       </div>
                     </div>
                   </div>
@@ -229,7 +230,7 @@ const ListSpace = () => {
                       <h3 className="text-lg font-medium mb-4">Available Amenities</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {amenityOptions.map((amenity) => (
-                          <label key={amenity} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                          <label key={amenity} className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted">
                             <input type="checkbox" className="rounded" />
                             <span className="text-sm">{amenity}</span>
                           </label>
@@ -239,10 +240,10 @@ const ListSpace = () => {
 
                     <div>
                       <h3 className="text-lg font-medium mb-4">Upload Photos</h3>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                        <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600">Click to upload photos of your parking space</p>
-                        <p className="text-sm text-gray-500 mt-2">JPG, PNG up to 10MB each. Minimum 3 photos required.</p>
+                      <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center">
+                        <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">Click to upload photos of your parking space</p>
+                        <p className="text-sm text-muted-foreground mt-2">JPG, PNG up to 10MB each. Minimum 3 photos required.</p>
                         <Button variant="outline" className="mt-4">Choose Files</Button>
                       </div>
                     </div>
@@ -286,13 +287,13 @@ const ListSpace = () => {
                       )}
                     />
 
-                    <Card className="bg-blue-50 border-blue-200">
+                    <Card className="bg-primary/10 border-primary/20">
                       <CardContent className="p-4">
-                        <h4 className="font-medium text-blue-900 mb-2">Monthly Subscription</h4>
-                        <p className="text-blue-800 text-sm mb-3">
+                        <h4 className="font-medium text-primary mb-2">Monthly Subscription</h4>
+                        <p className="text-primary/80 text-sm mb-3">
                           List your parking space for ₹299/month. Cancel anytime.
                         </p>
-                        <ul className="text-blue-700 text-sm space-y-1">
+                        <ul className="text-primary/70 text-sm space-y-1">
                           <li>• Unlimited bookings</li>
                           <li>• 24/7 customer support</li>
                           <li>• Performance analytics</li>
