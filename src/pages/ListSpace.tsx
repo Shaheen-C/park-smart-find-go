@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { MapPin, Upload, Check } from "lucide-react";
+import { Upload, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const ListSpace = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -54,11 +56,15 @@ const ListSpace = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900">ParkSmart</h1>
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <img src="/lovable-uploads/acd0e8ca-8b97-42ed-beab-ce9c633d5f4e.png" alt="Parkiko Logo" className="h-6 w-auto" />
+              </Link>
               <span className="text-gray-500">• List Your Space</span>
             </div>
-            <BackButton />
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <BackButton />
+            </div>
           </div>
         </div>
       </header>

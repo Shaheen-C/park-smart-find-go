@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +36,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Link to="/" className="hover:opacity-80 transition-opacity">
-                <img src="/lovable-uploads/96187da2-c8c1-4ac5-bcc3-919e1ef17bb7.png" alt="Parkiko Logo" className="h-8 w-auto" />
+                <img src="/lovable-uploads/acd0e8ca-8b97-42ed-beab-ce9c633d5f4e.png" alt="Parkiko Logo" className="h-8 w-auto" />
               </Link>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
@@ -183,8 +182,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <MapPin className="h-6 w-6 text-green-500" />
-                <span className="text-lg font-bold">Parkiko</span>
+                <img src="/lovable-uploads/acd0e8ca-8b97-42ed-beab-ce9c633d5f4e.png" alt="Parkiko Logo" className="h-6 w-auto" />
               </div>
               <p className="text-muted-foreground">
                 Kerala's premier parking marketplace connecting drivers with secure parking spaces.
