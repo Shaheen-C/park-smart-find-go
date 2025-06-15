@@ -50,7 +50,7 @@ const Search = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="backdrop-blur-xl bg-black/20 shadow-lg border-b border-white/10">
+      <header className="backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/20 shadow-lg border-b border-white/10 dark:border-white/10 light:border-black/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">

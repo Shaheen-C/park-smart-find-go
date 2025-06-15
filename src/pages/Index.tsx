@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10 shadow-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/20 border-b border-white/10 dark:border-white/10 light:border-black/10 shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -42,17 +43,17 @@ const Index = () => {
             <nav className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={handleFindParking}
-                className="text-white/80 hover:text-green-500 transition-colors"
+                className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors"
               >
                 Find Parking
               </button>
               <button 
                 onClick={handleListSpace}
-                className="text-white/80 hover:text-green-500 transition-colors"
+                className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors"
               >
                 List Your Space
               </button>
-              <Link to="/about" className="text-white/80 hover:text-green-500 transition-colors">About</Link>
+              <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">About</Link>
               <ThemeToggle />
               <Button variant="outline" asChild>
                 <Link to="/login">Sign In</Link>
