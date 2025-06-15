@@ -18,6 +18,7 @@ interface ParkingSpace {
   price_per_hour: number;
   accepts_cash_on_arrival?: boolean;
   vehicle_types?: string[];
+  additional_charges?: string;
 }
 
 interface BookingModalProps {
@@ -41,9 +42,22 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const parseAdditionalCharges = () => {
+    if (!parkingSpace.additional_charges) return 0;
+    
+    // Try to extract numeric value from additional charges string
+    const matches = parkingSpace.additional_charges.match(/₹?(\d+(?:\.\d+)?)/);
+    if (matches) {
+      return parseFloat(matches[1]);
+    }
+    return 0;
+  };
+
   const calculateTotal = () => {
     const hours = parseInt(formData.duration) || 0;
-    return hours * parkingSpace.price_per_hour;
+    const baseAmount = hours * parkingSpace.price_per_hour;
+    const additionalAmount = parseAdditionalCharges();
+    return baseAmount + additionalAmount;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,6 +131,8 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
   };
 
   const today = new Date().toISOString().split('T')[0];
+  const baseAmount = (parseInt(formData.duration) || 0) * parkingSpace.price_per_hour;
+  const additionalAmount = parseAdditionalCharges();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -265,15 +281,29 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
           </div>
 
           <div className="bg-muted p-3 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Total Amount:</span>
-              <span className="text-lg font-bold text-green-600">
-                ₹{calculateTotal()}
-              </span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span>Base Amount ({formData.duration} hour{parseInt(formData.duration) > 1 ? 's' : ''}):</span>
+                <span>₹{baseAmount}</span>
+              </div>
+              {additionalAmount > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span>Additional Charges:</span>
+                  <span>₹{additionalAmount}</span>
+                </div>
+              )}
+              <div className="border-t pt-2 flex justify-between items-center">
+                <span className="font-medium">Total Amount:</span>
+                <span className="text-lg font-bold text-green-600">
+                  ₹{calculateTotal()}
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {formData.duration} hour{parseInt(formData.duration) > 1 ? 's' : ''} × ₹{parkingSpace.price_per_hour}/hour
-            </p>
+            {parkingSpace.additional_charges && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Additional charges: {parkingSpace.additional_charges}
+              </p>
+            )}
           </div>
           
           <div className="flex gap-2">
