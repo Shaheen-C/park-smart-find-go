@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -282,7 +281,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
               </div>
               {additionalAmount > 0 && (
                 <div className="flex justify-between items-center text-sm">
-                  <span>Additional Charges:</span>
+                  <span>Reservation Charge:</span>
                   <span>₹{additionalAmount}</span>
                 </div>
               )}
@@ -295,7 +294,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
             </div>
             {parkingSpace.additional_charges && (
               <p className="text-xs text-muted-foreground mt-2">
-                Additional charges: {parkingSpace.additional_charges}
+                Reservation charge: {parkingSpace.additional_charges}
               </p>
             )}
           </div>

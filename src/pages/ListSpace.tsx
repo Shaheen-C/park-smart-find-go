@@ -498,12 +498,12 @@ const ListSpace = () => {
                       name="additionalCharges"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Additional Charges</FormLabel>
+                          <FormLabel>Reservation Charge</FormLabel>
                           <FormControl>
-                            <Input placeholder="Overnight parking: ₹200" {...field} />
+                            <Input placeholder="e.g., ₹100 booking fee" {...field} />
                           </FormControl>
                           <FormDescription>
-                            Optional extra charges
+                            Optional reservation fee charged per booking
                           </FormDescription>
                         </FormItem>
                       )}
