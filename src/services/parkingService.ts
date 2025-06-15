@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { imageUploadService } from "./imageUploadService";
 
 export interface ParkingSpaceData {
   spaceName: string;
@@ -15,7 +16,7 @@ export interface ParkingSpaceData {
   contactPhone: string;
   contactEmail: string;
   additionalCharges?: string;
-  imageUrls?: string[];
+  images?: File[];
 }
 
 export const parkingService = {
@@ -26,6 +27,19 @@ export const parkingService = {
       if (!user) {
         toast.error("You must be logged in to list a parking space");
         return { success: false, error: "Not authenticated" };
+      }
+
+      // Upload images first if provided
+      let imageUrls: string[] = [];
+      if (data.images && data.images.length > 0) {
+        console.log("Uploading images...", data.images.length);
+        imageUrls = await imageUploadService.uploadImages(data.images);
+        console.log("Images uploaded:", imageUrls);
+        
+        if (imageUrls.length === 0) {
+          toast.error("Failed to upload images. Please try again.");
+          return { success: false, error: "Image upload failed" };
+        }
       }
 
       const { error } = await supabase
@@ -44,7 +58,7 @@ export const parkingService = {
           contact_phone: data.contactPhone,
           contact_email: data.contactEmail,
           additional_charges: data.additionalCharges || null,
-          image_urls: data.imageUrls || []
+          image_urls: imageUrls
         });
 
       if (error) {

@@ -181,10 +181,6 @@ const ListSpace = () => {
     setIsSubmitting(true);
     
     try {
-      // For now, we'll store image file names as placeholders
-      // In a real app, you'd upload these to storage first
-      const imageUrls = uploadedImages.map(img => img.name);
-      
       const parkingData: ParkingSpaceData = {
         spaceName: data.spaceName,
         location: data.location,
@@ -198,7 +194,7 @@ const ListSpace = () => {
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
         additionalCharges: data.additionalCharges,
-        imageUrls: imageUrls
+        images: uploadedImages // Pass the actual File objects
       };
 
       const result = await parkingService.createParkingSpace(parkingData);
