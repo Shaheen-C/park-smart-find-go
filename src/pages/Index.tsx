@@ -33,10 +33,15 @@ const Index = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10 shadow-lg">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <MapPin className="h-8 w-8 text-green-500" />
-            <h1 className="text-2xl font-bold text-white">Parkiko</h1>
-          </Link>
+          <div className="flex items-center justify-center flex-1">
+            <Link to="/" className="flex flex-col items-center space-y-1 hover:opacity-80 transition-opacity">
+              <div className="flex items-center space-x-2">
+                <MapPin className="h-8 w-8 text-green-500" />
+                <h1 className="text-2xl font-bold text-green-500">Parkiko</h1>
+              </div>
+              <p className="text-sm text-white/70 font-medium">Park Smart, Park Easy</p>
+            </Link>
+          </div>
           <nav className="hidden md:flex items-center space-x-6">
             <button 
               onClick={handleFindParking}
