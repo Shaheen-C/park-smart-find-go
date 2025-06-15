@@ -10,6 +10,7 @@ import SignInModal from "@/components/SignInModal";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import ListSpace from "./pages/ListSpace";
+import ManageListings from "./pages/ManageListings";
 import ParkingDetails from "./pages/ParkingDetails";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/search" element={<Search />} />
               <Route path="/list-space" element={<ListSpace />} />
+              <Route path="/manage-listings" element={<ManageListings />} />
               <Route path="/parking/:id" element={<ParkingDetails />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/register" element={<Register />} />
