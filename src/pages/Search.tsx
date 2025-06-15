@@ -174,7 +174,7 @@ const Search = () => {
         </div>
 
         {/* Results */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <ParkingSpacesList
               loading={loading}
@@ -183,7 +183,7 @@ const Search = () => {
               onRefresh={loadParkingSpaces}
             />
           </div>
-          <div className="space-y-6">
+          <div>
             <MapPlaceholder 
               location={filteredSpaces.length > 0 ? filteredSpaces[0].location : undefined}
               onClick={() => {
@@ -193,10 +193,6 @@ const Search = () => {
                   window.open(googleMapsUrl, '_blank');
                 }
               }}
-            />
-            <NearbyFacilities 
-              userLocation={userLocation}
-              onLocationUpdate={setUserLocation}
             />
           </div>
         </div>

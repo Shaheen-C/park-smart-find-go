@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import ParkingDetails from "./pages/ParkingDetails";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import ManageListings from "./pages/ManageListings";
+import NearbyFacilitiesPage from "./pages/NearbyFacilities";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +32,7 @@ const App = () => (
               <Route path="/search" element={<Search />} />
               <Route path="/list-space" element={<ListSpace />} />
               <Route path="/manage-listings" element={<ManageListings />} />
+              <Route path="/nearby-facilities" element={<NearbyFacilitiesPage />} />
               <Route path="/parking/:id" element={<ParkingDetails />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/register" element={<Register />} />

@@ -68,6 +68,9 @@ const Index = () => {
               >
                 List Your Space
               </button>
+              <Link to="/nearby-facilities" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
+                Nearby Facilities
+              </Link>
               <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
                 About
               </Link>
