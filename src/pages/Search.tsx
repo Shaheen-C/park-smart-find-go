@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
@@ -6,6 +5,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import SearchFilters from "@/components/SearchFilters";
 import ParkingSpacesList from "@/components/ParkingSpacesList";
 import MapPlaceholder from "@/components/MapPlaceholder";
+import NearbyFacilities from "@/components/NearbyFacilities";
 import { parkingService } from "@/services/parkingService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,6 +33,7 @@ const Search = () => {
   const [parkingSpaces, setParkingSpaces] = useState<ParkingSpace[]>([]);
   const [loading, setLoading] = useState(true);
   const [filteredSpaces, setFilteredSpaces] = useState<ParkingSpace[]>([]);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -173,7 +174,7 @@ const Search = () => {
         </div>
 
         {/* Results */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2">
             <ParkingSpacesList
               loading={loading}
@@ -182,7 +183,7 @@ const Search = () => {
               onRefresh={loadParkingSpaces}
             />
           </div>
-          <div>
+          <div className="space-y-6">
             <MapPlaceholder 
               location={filteredSpaces.length > 0 ? filteredSpaces[0].location : undefined}
               onClick={() => {
@@ -192,6 +193,10 @@ const Search = () => {
                   window.open(googleMapsUrl, '_blank');
                 }
               }}
+            />
+            <NearbyFacilities 
+              userLocation={userLocation}
+              onLocationUpdate={setUserLocation}
             />
           </div>
         </div>
