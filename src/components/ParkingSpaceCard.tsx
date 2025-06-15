@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ParkingSpace {
@@ -12,6 +12,7 @@ interface ParkingSpace {
   amenities: string[];
   created_at: string;
   capacity: number;
+  available_spaces: number;
   description: string;
   contact_phone: string;
   contact_email: string;
@@ -30,6 +31,19 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
   const formatAmenities = (amenities: string[]) => {
     return amenities?.slice(0, 3) || [];
   };
+
+  const getAvailabilityStatus = () => {
+    const available = space.available_spaces || 0;
+    if (available === 0) {
+      return { text: "Full", color: "text-red-500" };
+    } else if (available <= space.capacity * 0.3) {
+      return { text: "Limited", color: "text-orange-500" };
+    } else {
+      return { text: "Available", color: "text-green-500" };
+    }
+  };
+
+  const availabilityStatus = getAvailabilityStatus();
 
   // Debug image URLs
   console.log("Parking space:", space.space_name);
@@ -62,8 +76,12 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
             <div className="text-xl font-bold text-green-500">
               {formatPrice(space.price_per_hour)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Capacity: {space.capacity}
+            <div className="flex items-center gap-1 text-sm">
+              <Users className="h-4 w-4" />
+              <span>{space.available_spaces || 0}/{space.capacity}</span>
+              <span className={`font-medium ${availabilityStatus.color}`}>
+                {availabilityStatus.text}
+              </span>
             </div>
           </div>
         </div>
@@ -126,8 +144,11 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
             )}
         </div>
         <div className="flex gap-2">
-          <Button className="flex-1">
-            Book Now
+          <Button 
+            className="flex-1" 
+            disabled={space.available_spaces === 0}
+          >
+            {space.available_spaces === 0 ? "Fully Booked" : "Book Now"}
           </Button>
           <Link to={`/parking/${space.id}`}>
             <Button variant="outline">View Details</Button>

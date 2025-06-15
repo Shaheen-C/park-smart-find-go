@@ -6,8 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, MapPin, Car, Clock, Eye, EyeOff } from "lucide-react";
+import { Trash2, MapPin, Car, Clock, Eye, EyeOff, Edit } from "lucide-react";
 import BackButton from "@/components/BackButton";
+import EditParkingModal from "@/components/EditParkingModal";
 
 interface ParkingSpace {
   id: string;
@@ -15,6 +16,7 @@ interface ParkingSpace {
   location: string;
   price_per_hour: number;
   capacity: number;
+  available_spaces: number;
   description: string;
   is_active: boolean;
   created_at: string;
@@ -23,6 +25,8 @@ interface ParkingSpace {
 const ManageListings = () => {
   const [listings, setListings] = useState<ParkingSpace[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedSpace, setSelectedSpace] = useState<ParkingSpace | null>(null);
   const { user, isSignedIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -110,6 +114,11 @@ const ManageListings = () => {
     }
   };
 
+  const handleEditClick = (space: ParkingSpace) => {
+    setSelectedSpace(space);
+    setEditModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -164,6 +173,14 @@ const ManageListings = () => {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => handleEditClick(listing)}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => toggleActive(listing.id, listing.is_active)}
                       >
                         {listing.is_active ? (
@@ -194,10 +211,13 @@ const ManageListings = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid md:grid-cols-4 gap-4 mb-4">
                     <div className="flex items-center gap-2">
                       <Car className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Capacity: {listing.capacity}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">Available: {listing.available_spaces || 0}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">₹{listing.price_per_hour}/hour</span>
@@ -212,6 +232,15 @@ const ManageListings = () => {
               </Card>
             ))}
           </div>
+        )}
+
+        {selectedSpace && (
+          <EditParkingModal
+            open={editModalOpen}
+            onOpenChange={setEditModalOpen}
+            parkingSpace={selectedSpace}
+            onUpdate={fetchListings}
+          />
         )}
       </div>
     </div>

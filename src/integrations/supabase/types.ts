@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           additional_charges: string | null
           amenities: string[] | null
+          available_spaces: number | null
           capacity: number
           contact_email: string
           contact_phone: string
@@ -35,6 +36,7 @@ export type Database = {
         Insert: {
           additional_charges?: string | null
           amenities?: string[] | null
+          available_spaces?: number | null
           capacity: number
           contact_email: string
           contact_phone: string
@@ -57,6 +59,7 @@ export type Database = {
         Update: {
           additional_charges?: string | null
           amenities?: string[] | null
+          available_spaces?: number | null
           capacity?: number
           contact_email?: string
           contact_phone?: string

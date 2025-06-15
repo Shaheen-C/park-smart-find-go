@@ -62,6 +62,7 @@ export const parkingService = {
 
       console.log("Proceeding to create parking space record...");
 
+      const capacity = parseInt(data.capacity);
       const { error } = await supabase
         .from('parking_spaces')
         .insert({
@@ -71,7 +72,8 @@ export const parkingService = {
           precise_location: data.preciseLocation || null,
           description: data.description,
           price_per_hour: parseFloat(data.pricePerHour),
-          capacity: parseInt(data.capacity),
+          capacity: capacity,
+          available_spaces: capacity, // Initially set available spaces equal to capacity
           amenities: data.amenities,
           vehicle_types: data.vehicleTypes,
           vehicle_counts: data.vehicleCounts || {},

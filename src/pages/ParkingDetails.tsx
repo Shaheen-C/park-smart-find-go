@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Phone, Mail, Car, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Mail, Car, Clock, Users } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { parkingService } from "@/services/parkingService";
@@ -17,6 +18,7 @@ interface ParkingSpace {
   amenities: string[];
   created_at: string;
   capacity: number;
+  available_spaces: number;
   description: string;
   contact_phone: string;
   contact_email: string;
@@ -64,6 +66,19 @@ const ParkingDetails = () => {
 
   const formatPrice = (price: number) => {
     return `₹${price}/hour`;
+  };
+
+  const getAvailabilityStatus = () => {
+    if (!parkingSpace) return { text: "Unknown", color: "text-gray-500" };
+    
+    const available = parkingSpace.available_spaces || 0;
+    if (available === 0) {
+      return { text: "Full", color: "text-red-500" };
+    } else if (available <= parkingSpace.capacity * 0.3) {
+      return { text: "Limited Availability", color: "text-orange-500" };
+    } else {
+      return { text: "Available", color: "text-green-500" };
+    }
   };
 
   if (loading) {
@@ -123,6 +138,8 @@ const ParkingDetails = () => {
     );
   }
 
+  const availabilityStatus = getAvailabilityStatus();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -167,7 +184,15 @@ const ParkingDetails = () => {
                     {formatPrice(parkingSpace.price_per_hour)}
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-semibold">Capacity: {parkingSpace.capacity}</div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="h-5 w-5" />
+                      <span className="text-lg font-semibold">
+                        {parkingSpace.available_spaces || 0}/{parkingSpace.capacity}
+                      </span>
+                    </div>
+                    <div className={`text-sm font-medium ${availabilityStatus.color}`}>
+                      {availabilityStatus.text}
+                    </div>
                   </div>
                 </div>
                 
@@ -182,8 +207,11 @@ const ParkingDetails = () => {
                   </div>
                 )}
 
-                <Button className="w-full bg-green-600 hover:bg-green-700">
-                  Book Now
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={parkingSpace.available_spaces === 0}
+                >
+                  {parkingSpace.available_spaces === 0 ? "Fully Booked" : "Book Now"}
                 </Button>
               </CardContent>
             </Card>
