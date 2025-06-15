@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,6 +167,16 @@ const ListSpace = () => {
       setShowSignInModal(true);
       return;
     }
+
+    // Final validation for step 4
+    if (!data.contactPhone || !data.contactEmail) {
+      toast({
+        title: "Contact information required",
+        description: "Please provide both phone number and email address.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -260,13 +269,15 @@ const ListSpace = () => {
       }
     }
 
-    if (currentStep === 3 && uploadedImages.length < 3) {
-      toast({
-        title: "Minimum images required",
-        description: "Please upload at least 3 photos of your parking space.",
-        variant: "destructive"
-      });
-      return;
+    if (currentStep === 3) {
+      if (uploadedImages.length < 3) {
+        toast({
+          title: "Minimum images required",
+          description: "Please upload at least 3 photos of your parking space.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     setCurrentStep(Math.min(steps.length, currentStep + 1));
