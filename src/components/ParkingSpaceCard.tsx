@@ -31,11 +31,21 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
     return amenities?.slice(0, 3) || [];
   };
 
+  // Debug image URLs
+  console.log("Parking space:", space.space_name);
+  console.log("Image URLs:", space.image_urls);
+  console.log("First image URL:", space.image_urls?.[0]);
+
   // Check if we have a valid image URL
   const hasValidImage = space.image_urls && 
     space.image_urls.length > 0 && 
     space.image_urls[0] && 
-    space.image_urls[0].startsWith('http');
+    space.image_urls[0].trim() !== '';
+
+  const imageUrl = hasValidImage ? space.image_urls[0] : null;
+
+  console.log("Has valid image:", hasValidImage);
+  console.log("Using image URL:", imageUrl);
 
   return (
     <Card>
@@ -62,30 +72,39 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
         {/* Display image or placeholder */}
         <div className="mb-4">
           {hasValidImage ? (
-            <img
-              src={space.image_urls[0]}
-              alt={space.space_name}
-              className="w-full h-32 object-cover rounded-lg"
-              onError={(e) => {
-                console.log("Image failed to load:", space.image_urls[0]);
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
+            <div className="relative">
+              <img
+                src={imageUrl}
+                alt={space.space_name}
+                className="w-full h-32 object-cover rounded-lg"
+                onError={(e) => {
+                  console.error("Image failed to load:", imageUrl);
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) {
+                    fallback.style.display = 'flex';
+                  }
+                }}
+                onLoad={() => {
+                  console.log("Image loaded successfully:", imageUrl);
+                }}
+              />
+              <div className="hidden w-full h-32 bg-muted rounded-lg items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
+                  <p className="text-sm">Image Failed to Load</p>
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
               <div className="text-center text-muted-foreground">
                 <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
                 <p className="text-sm">No Image Available</p>
-              </div>
-            </div>
-          )}
-          {hasValidImage && (
-            <div className="hidden w-full h-32 bg-muted rounded-lg flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
-                <p className="text-sm">Image Failed to Load</p>
+                {space.image_urls && space.image_urls.length > 0 && (
+                  <p className="text-xs mt-1 break-all px-2">Debug: {space.image_urls[0]}</p>
+                )}
               </div>
             </div>
           )}
@@ -104,7 +123,7 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
             <span className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full">
               +{space.amenities.length - 3} more
             </span>
-          )}
+            )}
         </div>
         <div className="flex gap-2">
           <Button className="flex-1">
