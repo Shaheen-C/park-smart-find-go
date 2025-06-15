@@ -206,14 +206,14 @@ const Search = () => {
                 <Card key={space.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-1">
                         <CardTitle className="text-lg">{space.space_name}</CardTitle>
                         <CardDescription className="flex items-center gap-1 mt-1">
                           <MapPin className="h-4 w-4" />
                           {space.location}
                         </CardDescription>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right ml-4">
                         <div className="text-xl font-bold text-green-500">
                           {formatPrice(space.price_per_hour)}
                         </div>
@@ -224,6 +224,16 @@ const Search = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
+                    {/* Show placeholder image instead of trying to load file names */}
+                    <div className="mb-4">
+                      <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                          <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
+                          <p className="text-sm">Parking Space Image</p>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {space.description}
                     </p>
