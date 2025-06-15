@@ -1,9 +1,7 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,8 +22,7 @@ const Register = () => {
     businessName: "",
     userType: "",
     password: "",
-    confirmPassword: "",
-    agreeToTerms: false
+    confirmPassword: ""
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -241,28 +238,10 @@ const Register = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={formData.agreeToTerms}
-                    onCheckedChange={(checked) => updateForm("agreeToTerms", !!checked)}
-                  />
-                  <label htmlFor="terms" className="text-sm text-muted-foreground">
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-green-600 hover:text-green-700">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-green-600 hover:text-green-700">
-                      Privacy Policy
-                    </Link>
-                  </label>
-                </div>
-                
                 <Button 
                   type="submit" 
                   className="w-full bg-green-600 hover:bg-green-700" 
-                  disabled={!formData.agreeToTerms || !formData.userType || isLoading}
+                  disabled={!formData.userType || isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
