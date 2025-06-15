@@ -1,11 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Search as SearchIcon, MapPin, X } from "lucide-react";
+import { Search as SearchIcon, MapPin, X, Navigation } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchFiltersProps {
   location: string;
@@ -30,6 +30,8 @@ const SearchFilters = ({
   setSelectedAmenities,
   onSearch
 }: SearchFiltersProps) => {
+  const { toast } = useToast();
+  
   const commonAmenities = [
     "Security Camera",
     "24/7 Access",
@@ -58,6 +60,58 @@ const SearchFilters = ({
     setSelectedAmenities([]);
   };
 
+  const handleNearMe = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Location not supported",
+        description: "Your browser doesn't support location services.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Getting your location...",
+      description: "Please allow location access to find nearby parking."
+    });
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        toast({
+          title: "Location found",
+          description: "Searching for parking spaces near your location."
+        });
+        onSearch();
+      },
+      (error) => {
+        let errorMessage = "Unable to get your location.";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location permissions.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+        toast({
+          title: "Location error",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  };
+
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -84,6 +138,15 @@ const SearchFilters = ({
                   className="pl-10"
                 />
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 w-full"
+                onClick={handleNearMe}
+              >
+                <Navigation className="mr-2 h-4 w-4" />
+                Parking Near Me
+              </Button>
             </div>
             
             {/* Availability Filter */}
