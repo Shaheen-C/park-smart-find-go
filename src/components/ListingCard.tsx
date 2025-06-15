@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import ReservationsList from "./ReservationsList";
 
 interface ParkingSpace {
   id: string;
@@ -176,7 +176,12 @@ const ListingCard = ({ listing, onEdit, onToggleActive, onDelete, actionLoading 
             <span className="text-sm">Listed: {new Date(listing.created_at).toLocaleDateString()}</span>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">{listing.description}</p>
+        <p className="text-sm text-muted-foreground mb-4">{listing.description}</p>
+        
+        <ReservationsList 
+          parkingSpaceId={listing.id} 
+          spaceName={listing.space_name}
+        />
       </CardContent>
     </Card>
   );
