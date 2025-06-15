@@ -53,9 +53,22 @@ const ParkingSpaceCard = ({ space }: ParkingSpaceCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Show placeholder image instead of trying to load file names */}
+        {/* Display actual image if available, otherwise show placeholder */}
         <div className="mb-4">
-          <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
+          {space.image_urls && space.image_urls.length > 0 ? (
+            <img
+              src={space.image_urls[0]}
+              alt={space.space_name}
+              className="w-full h-32 object-cover rounded-lg"
+              onError={(e) => {
+                // Fallback to placeholder if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <div className={`w-full h-32 bg-muted rounded-lg flex items-center justify-center ${space.image_urls && space.image_urls.length > 0 ? 'hidden' : ''}`}>
             <div className="text-center text-muted-foreground">
               <MapPin className="h-8 w-8 mx-auto mb-1 text-green-500" />
               <p className="text-sm">Parking Space Image</p>
