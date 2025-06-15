@@ -34,11 +34,11 @@ const ParkingSpaceCard = ({ space, currentUserId }: ParkingSpaceCardProps) => {
   const getAvailabilityStatus = () => {
     const available = space.available_spaces || 0;
     if (available === 0) {
-      return { text: "Full", color: "text-red-500 bg-red-50" };
+      return { text: "Full", color: "text-red-500 bg-red-50 dark:bg-red-900/20 dark:text-red-400" };
     } else if (available <= space.capacity * 0.3) {
-      return { text: "Limited", color: "text-orange-500 bg-orange-50" };
+      return { text: "Limited", color: "text-orange-500 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400" };
     } else {
-      return { text: "Available", color: "text-green-500 bg-green-50" };
+      return { text: "Available", color: "text-green-500 bg-green-50 dark:bg-green-900/20 dark:text-green-400" };
     }
   };
 
