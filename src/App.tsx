@@ -18,6 +18,7 @@ import MyReservations from "./pages/MyReservations";
 import NearbyFacilitiesPage from "./pages/NearbyFacilities";
 import FastagRecharge from "./pages/FastagRecharge";
 import About from "./pages/About";
+import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/my-reservations" element={<MyReservations />} />
               <Route path="/nearby-facilities" element={<NearbyFacilitiesPage />} />
               <Route path="/fastag-recharge" element={<FastagRecharge />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/about" element={<About />} />
               <Route path="/parking/:id" element={<ParkingDetails />} />
               <Route path="/login" element={<SignIn />} />

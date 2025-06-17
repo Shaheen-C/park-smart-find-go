@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,6 +88,9 @@ const Index = () => {
               </Link>
               <Link to="/fastag-recharge" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
                 FASTag Recharge
+              </Link>
+              <Link to="/how-it-works" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
+                How It Works
               </Link>
               <Link to="/about" className="text-white/80 dark:text-white/80 light:text-black/80 hover:text-green-500 transition-colors">
                 About
@@ -184,6 +186,13 @@ const Index = () => {
                     >
                       <CreditCard className="h-5 w-5" />
                       <span>FASTag Recharge</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleMobileNavClick("/how-it-works")}
+                      className="flex items-center space-x-2 text-left text-foreground hover:text-green-500 transition-colors p-2"
+                    >
+                      <span>How It Works</span>
                     </button>
                     
                     <button
@@ -399,20 +408,7 @@ const Index = () => {
               <h4 className="font-semibold mb-4">For Drivers</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><Link to="/search" className="hover:text-green-500">Find Parking</Link></li>
-                <li>
-                  <div className="hover:text-green-500 cursor-pointer">
-                    <details className="group">
-                      <summary className="list-none cursor-pointer">How It Works</summary>
-                      <div className="mt-2 ml-4 text-sm space-y-1">
-                        <p>• Search for parking spaces near your destination</p>
-                        <p>• Compare prices, amenities, and reviews</p>
-                        <p>• Book instantly with secure payment</p>
-                        <p>• Get directions and access details</p>
-                        <p>• Park safely and leave reviews</p>
-                      </div>
-                    </details>
-                  </div>
-                </li>
+                <li><Link to="/how-it-works" className="hover:text-green-500">How It Works</Link></li>
                 <li><Link to="/mobile-app" className="hover:text-green-500">Mobile App</Link></li>
               </ul>
             </div>
@@ -420,20 +416,6 @@ const Index = () => {
               <h4 className="font-semibold mb-4">For Owners</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><Link to="/list-space" className="hover:text-green-500">List Your Space</Link></li>
-                <li>
-                  <div className="hover:text-green-500 cursor-pointer">
-                    <details className="group">
-                      <summary className="list-none cursor-pointer">Pricing</summary>
-                      <div className="mt-2 ml-4 text-sm space-y-1">
-                        <p>• Set your own hourly/daily rates</p>
-                        <p>• 15% platform commission on bookings</p>
-                        <p>• Free to list your parking space</p>
-                        <p>• Dynamic pricing based on demand</p>
-                        <p>• Weekly payouts to your account</p>
-                      </div>
-                    </details>
-                  </div>
-                </li>
               </ul>
             </div>
             <div>
