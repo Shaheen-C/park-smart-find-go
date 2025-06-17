@@ -71,11 +71,11 @@ const HowItWorks = () => {
                 <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   3
                 </div>
-                <CardTitle className="text-lg">Book</CardTitle>
+                <CardTitle className="text-lg">Reserve</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Reserve instantly with secure payment and get confirmation
+                  Reserve instantly and get confirmation for your parking spot
                 </p>
               </CardContent>
             </Card>
@@ -218,37 +218,6 @@ const HowItWorks = () => {
                 </p>
               </CardContent>
             </Card>
-          </div>
-
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 rounded-lg p-8">
-            <h3 className="text-2xl font-bold text-center mb-6">Earning Potential</h3>
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Prime Location (City Center)</span>
-                    <span className="font-bold text-green-600">₹100-200/hour</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Residential Area</span>
-                    <span className="font-bold text-green-600">₹50-100/hour</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Near Offices/Malls</span>
-                    <span className="font-bold text-green-600">₹75-150/hour</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Platform Commission</span>
-                    <span className="font-bold text-red-600">15%</span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">₹15,000+</div>
-                <p className="text-muted-foreground">Average monthly earnings for active spaces</p>
-                <p className="text-sm text-muted-foreground mt-2">*Based on 6-8 hours daily usage</p>
-              </div>
-            </div>
           </div>
         </section>
 
