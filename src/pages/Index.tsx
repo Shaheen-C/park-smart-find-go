@@ -61,7 +61,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Link to="/" className="hover:opacity-80 transition-opacity">
+              <Link to="/parkiko" className="hover:opacity-80 transition-opacity">
                 <img
                   src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png"
                   alt="Parkiko Logo"
