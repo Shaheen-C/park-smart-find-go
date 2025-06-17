@@ -399,7 +399,20 @@ const Index = () => {
               <h4 className="font-semibold mb-4">For Drivers</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><Link to="/search" className="hover:text-green-500">Find Parking</Link></li>
-                <li><Link to="/how-it-works" className="hover:text-green-500">How It Works</Link></li>
+                <li>
+                  <div className="hover:text-green-500 cursor-pointer">
+                    <details className="group">
+                      <summary className="list-none cursor-pointer">How It Works</summary>
+                      <div className="mt-2 ml-4 text-sm space-y-1">
+                        <p>• Search for parking spaces near your destination</p>
+                        <p>• Compare prices, amenities, and reviews</p>
+                        <p>• Book instantly with secure payment</p>
+                        <p>• Get directions and access details</p>
+                        <p>• Park safely and leave reviews</p>
+                      </div>
+                    </details>
+                  </div>
+                </li>
                 <li><Link to="/mobile-app" className="hover:text-green-500">Mobile App</Link></li>
               </ul>
             </div>
@@ -407,16 +420,30 @@ const Index = () => {
               <h4 className="font-semibold mb-4">For Owners</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><Link to="/list-space" className="hover:text-green-500">List Your Space</Link></li>
-                <li><Link to="/pricing" className="hover:text-green-500">Pricing</Link></li>
-                <li><Link to="/resources" className="hover:text-green-500">Resources</Link></li>
+                <li>
+                  <div className="hover:text-green-500 cursor-pointer">
+                    <details className="group">
+                      <summary className="list-none cursor-pointer">Pricing</summary>
+                      <div className="mt-2 ml-4 text-sm space-y-1">
+                        <p>• Set your own hourly/daily rates</p>
+                        <p>• 15% platform commission on bookings</p>
+                        <p>• Free to list your parking space</p>
+                        <p>• Dynamic pricing based on demand</p>
+                        <p>• Weekly payouts to your account</p>
+                      </div>
+                    </details>
+                  </div>
+                </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+              <h4 className="font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-muted-foreground">
-                <li><Link to="/help" className="hover:text-green-500">Help Center</Link></li>
-                <li><Link to="/contact" className="hover:text-green-500">Contact Us</Link></li>
-                <li><Link to="/safety" className="hover:text-green-500">Safety</Link></li>
+                <li>
+                  <a href="mailto:shaheenshanu246@gmail.com" className="hover:text-green-500">
+                    shaheenshanu246@gmail.com
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
