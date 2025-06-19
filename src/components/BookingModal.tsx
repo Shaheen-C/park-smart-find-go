@@ -1,11 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Banknote } from "lucide-react";
+import { Calendar, Clock, Banknote, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +18,8 @@ interface ParkingSpace {
   accepts_cash_on_arrival?: boolean;
   vehicle_types?: string[];
   additional_charges?: string;
+  available_spaces?: number;
+  capacity?: number;
 }
 
 interface BookingModalProps {
@@ -36,8 +39,31 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
     specialInstructions: ""
   });
   const [loading, setLoading] = useState(false);
+  const [currentAvailableSpaces, setCurrentAvailableSpaces] = useState(parkingSpace.available_spaces || 0);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Fetch current available spaces when modal opens
+  useEffect(() => {
+    if (open && parkingSpace.id) {
+      fetchCurrentAvailability();
+    }
+  }, [open, parkingSpace.id]);
+
+  const fetchCurrentAvailability = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('parking_spaces')
+        .select('available_spaces')
+        .eq('id', parkingSpace.id)
+        .single();
+
+      if (error) throw error;
+      setCurrentAvailableSpaces(data?.available_spaces || 0);
+    } catch (error) {
+      console.error('Error fetching availability:', error);
+    }
+  };
 
   const parseAdditionalCharges = () => {
     if (!parkingSpace.additional_charges) return 0;
@@ -78,6 +104,16 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
       return;
     }
 
+    // Check if spaces are available
+    if (currentAvailableSpaces <= 0) {
+      toast({
+        title: "No spaces available",
+        description: "This parking space is currently full. Please try another location.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -111,6 +147,9 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
         title: "Reservation created!",
         description: `Your parking spot is reserved for ${formData.arrivalDate} at ${formData.arrivalTime}. Pay cash on arrival.`,
       });
+      
+      // Update local available spaces count
+      setCurrentAvailableSpaces(prev => Math.max(0, prev - 1));
       
       onOpenChange(false);
       resetForm();
@@ -148,6 +187,31 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
         <DialogHeader>
           <DialogTitle>Reserve Parking Space</DialogTitle>
         </DialogHeader>
+
+        {/* Availability Warning */}
+        {currentAvailableSpaces <= 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <span className="font-medium text-red-900">No spaces available</span>
+            </div>
+            <p className="text-sm text-red-700 mt-1">
+              This parking space is currently full. Please try another location.
+            </p>
+          </div>
+        )}
+
+        {/* Availability Info */}
+        {currentAvailableSpaces > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-green-900">Available Spaces</span>
+              <span className="text-sm font-bold text-green-600">
+                {currentAvailableSpaces} of {parkingSpace.capacity || 'N/A'}
+              </span>
+            </div>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -173,6 +237,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
                 value={formData.arrivalDate}
                 onChange={(e) => setFormData({ ...formData, arrivalDate: e.target.value })}
                 required
+                disabled={currentAvailableSpaces <= 0}
               />
             </div>
             <div>
@@ -186,13 +251,18 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
                 value={formData.arrivalTime}
                 onChange={(e) => setFormData({ ...formData, arrivalTime: e.target.value })}
                 required
+                disabled={currentAvailableSpaces <= 0}
               />
             </div>
           </div>
 
           <div>
             <Label htmlFor="duration">Duration (hours)</Label>
-            <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
+            <Select 
+              value={formData.duration} 
+              onValueChange={(value) => setFormData({ ...formData, duration: value })}
+              disabled={currentAvailableSpaces <= 0}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
@@ -208,7 +278,11 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
 
           <div>
             <Label htmlFor="vehicle-type">Vehicle Type</Label>
-            <Select value={formData.vehicleType} onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}>
+            <Select 
+              value={formData.vehicleType} 
+              onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}
+              disabled={currentAvailableSpaces <= 0}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select vehicle type" />
               </SelectTrigger>
@@ -237,6 +311,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
                 placeholder="e.g., AB 12 CD 3456"
                 value={formData.vehicleNumber}
                 onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value })}
+                disabled={currentAvailableSpaces <= 0}
               />
             </div>
             <div>
@@ -248,6 +323,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
                 value={formData.contactPhone}
                 onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
                 required
+                disabled={currentAvailableSpaces <= 0}
               />
             </div>
           </div>
@@ -270,6 +346,7 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
               value={formData.specialInstructions}
               onChange={(e) => setFormData({ ...formData, specialInstructions: e.target.value })}
               rows={3}
+              disabled={currentAvailableSpaces <= 0}
             />
           </div>
 
@@ -300,8 +377,12 @@ const BookingModal = ({ open, onOpenChange, parkingSpace }: BookingModalProps) =
           </div>
           
           <div className="flex gap-2">
-            <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? "Creating Reservation..." : "Reserve Now"}
+            <Button 
+              type="submit" 
+              disabled={loading || currentAvailableSpaces <= 0} 
+              className="flex-1"
+            >
+              {loading ? "Creating Reservation..." : currentAvailableSpaces <= 0 ? "No Spaces Available" : "Reserve Now"}
             </Button>
             <Button 
               type="button" 
