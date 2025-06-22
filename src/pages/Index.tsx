@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -282,10 +283,10 @@ const Index = () => {
             <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full"></div>
           </div>
 
-          <h2 className="text-5xl font-bold text-foreground mb-6">
+          <h2 className="text-5xl font-bold text-white mb-6">
             Find & Book Parking Spaces Instantly
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-gray-200 mb-8">
             Discover secure parking spots near you or monetize your unused parking space.
             Perfect for visitors, tourists, and daily commuters across Kerala.
           </p>
