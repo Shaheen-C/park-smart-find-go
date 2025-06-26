@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -73,7 +74,6 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
         className={`
           h-full flex flex-col transition-all duration-500 ease-in-out transform
           hover:scale-105 hover:shadow-2xl hover:shadow-green-500/20
-          ${isHovered ? 'animate-pulse' : ''}
           relative overflow-hidden
           before:absolute before:inset-0 before:bg-gradient-to-br 
           before:from-green-500/5 before:to-blue-500/5 before:opacity-0 
@@ -85,7 +85,7 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
         <CardHeader className="relative z-10">
           <div className="flex justify-between items-start">
             <CardTitle className="text-lg animate-fade-in">{space.space_name}</CardTitle>
-            <Badge className={`px-2 py-1 text-xs animate-bounce ${availabilityStatus.color}`}>
+            <Badge className={`px-2 py-1 text-xs ${availabilityStatus.color}`}>
               {availabilityStatus.text}
             </Badge>
           </div>
@@ -107,23 +107,23 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
         
         <CardContent className="flex-1 flex flex-col relative z-10">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-2xl font-bold text-green-500 animate-pulse">
+            <div className="text-2xl font-bold text-green-500">
               {formatPrice(space.price_per_hour)}
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <PulsingIcon Icon={Users} size={16} />
+              <Users size={16} />
               <span className="animate-fade-in">{space.available_spaces || 0}/{space.capacity}</span>
             </div>
           </div>
 
           <div className="flex gap-2 mb-3">
             <div className="flex items-center gap-1 text-xs text-muted-foreground transition-all duration-300 hover:text-green-500">
-              <PulsingIcon Icon={CreditCard} size={12} />
+              <CreditCard size={12} />
               <span>Online</span>
             </div>
             {space.accepts_cash_on_arrival && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground transition-all duration-300 hover:text-blue-500">
-                <PulsingIcon Icon={Banknote} size={12} />
+                <Banknote size={12} />
                 <span>Cash</span>
               </div>
             )}
@@ -142,9 +142,9 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
                       className="flex items-center gap-1 text-xs transition-all duration-300 hover:scale-105"
                       style={{ animationDelay: `${300 + index * 100}ms` }}
                     >
-                      <PulsingIcon Icon={VehicleIcon} size={12} />
+                      <VehicleIcon size={12} />
                       <span className="truncate">{vehicleType}:</span>
-                      <span className="font-medium text-green-600 animate-pulse">{count}</span>
+                      <span className="font-medium text-green-600">{count}</span>
                     </div>
                   );
                 })}
@@ -170,7 +170,7 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
             {space.amenities?.length > 3 && (
               <Badge 
                 variant="secondary" 
-                className="text-xs animate-bounce hover:scale-110"
+                className="text-xs hover:scale-110"
                 style={{ animationDelay: '900ms' }}
               >
                 +{space.amenities.length - 3} more
@@ -189,7 +189,7 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
                 onClick={() => setBookingModalOpen(true)}
                 className="flex-1 bg-green-600 hover:bg-green-700 hover:shadow-green-500/50"
               >
-                <PulsingIcon Icon={Car} size={16} className="mr-2" />
+                <Car size={16} className="mr-2" />
                 Book Now
               </GlowingButton>
             )}
