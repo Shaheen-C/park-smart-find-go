@@ -21,7 +21,7 @@ interface ParkingSpace {
   description: string;
   amenities: string[];
   vehicle_types: string[];
-  vehicle_counts: { [key: string]: number };
+  vehicle_counts: Record<string, any>;
   contact_phone: string;
   contact_email: string;
   image_urls: string[];
@@ -58,7 +58,14 @@ const ParkingDetails = () => {
         return;
       }
 
-      setSpace(data);
+      if (data) {
+        // Convert vehicle_counts from Json to proper object
+        const processedData = {
+          ...data,
+          vehicle_counts: (data.vehicle_counts as any) || {}
+        };
+        setSpace(processedData);
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {

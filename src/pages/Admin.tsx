@@ -10,10 +10,7 @@ import {
   MapPin, 
   Star, 
   Calendar, 
-  TrendingUp, 
-  AlertCircle,
   Search,
-  Eye,
   Trash2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,11 +38,8 @@ interface ParkingSpace {
   created_at: string;
   average_rating: number;
   total_reviews: number;
-  profiles?: {
-    first_name: string;
-    last_name: string;
-    phone: string;
-  };
+  owner_name?: string;
+  owner_phone?: string;
 }
 
 interface Review {
@@ -53,13 +47,8 @@ interface Review {
   rating: number;
   review_text: string;
   created_at: string;
-  parking_spaces: {
-    space_name: string;
-  };
-  profiles: {
-    first_name: string;
-    last_name: string;
-  };
+  parking_space_name: string;
+  reviewer_name: string;
 }
 
 const Admin = () => {
@@ -146,37 +135,67 @@ const Admin = () => {
       });
 
       // Fetch parking spaces with owner details
-      const { data: spaces } = await supabase
+      const { data: spacesRaw } = await supabase
         .from('parking_spaces')
-        .select(`
-          *,
-          profiles (
-            first_name,
-            last_name,
-            phone
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      setParkingSpaces(spaces || []);
+      // Get owner details for each space
+      const spacesWithOwners = await Promise.all(
+        (spacesRaw || []).map(async (space) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, phone')
+            .eq('id', space.user_id)
+            .maybeSingle();
+          
+          return {
+            ...space,
+            owner_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Unknown',
+            owner_phone: profile?.phone || ''
+          };
+        })
+      );
 
-      // Fetch recent reviews
-      const { data: reviewsData } = await supabase
+      setParkingSpaces(spacesWithOwners);
+
+      // Fetch recent reviews with parking space and reviewer details
+      const { data: reviewsRaw } = await supabase
         .from('parking_reviews')
-        .select(`
-          *,
-          parking_spaces (
-            space_name
-          ),
-          profiles (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
-      setReviews(reviewsData || []);
+      // Get parking space names and reviewer names
+      const reviewsWithDetails = await Promise.all(
+        (reviewsRaw || []).map(async (review) => {
+          const [spaceResult, profileResult] = await Promise.all([
+            supabase
+              .from('parking_spaces')
+              .select('space_name')
+              .eq('id', review.parking_space_id)
+              .maybeSingle(),
+            supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', review.user_id)
+              .maybeSingle()
+          ]);
+          
+          return {
+            id: review.id,
+            rating: review.rating,
+            review_text: review.review_text,
+            created_at: review.created_at,
+            parking_space_name: spaceResult.data?.space_name || 'Unknown Space',
+            reviewer_name: profileResult.data ? 
+              `${profileResult.data.first_name || ''} ${profileResult.data.last_name || ''}`.trim() : 
+              'Anonymous User'
+          };
+        })
+      );
+
+      setReviews(reviewsWithDetails);
     } catch (error) {
       console.error('Error fetching admin data:', error);
       toast.error("Failed to load admin data");
@@ -337,8 +356,8 @@ const Admin = () => {
                           <h3 className="font-semibold">{space.space_name}</h3>
                           <p className="text-sm text-muted-foreground">{space.location}</p>
                           <p className="text-xs text-muted-foreground">
-                            Owner: {space.profiles?.first_name} {space.profiles?.last_name} 
-                            {space.profiles?.phone && ` • ${space.profiles.phone}`}
+                            Owner: {space.owner_name}
+                            {space.owner_phone && ` • ${space.owner_phone}`}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -404,11 +423,11 @@ const Admin = () => {
                               ))}
                             </div>
                             <span className="text-sm font-medium">
-                              {review.profiles.first_name} {review.profiles.last_name}
+                              {review.reviewer_name}
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground mb-1">
-                            {review.parking_spaces.space_name}
+                            {review.parking_space_name}
                           </p>
                           {review.review_text && (
                             <p className="text-sm">{review.review_text}</p>

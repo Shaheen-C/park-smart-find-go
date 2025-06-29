@@ -14,10 +14,7 @@ interface Review {
   rating: number;
   review_text: string | null;
   created_at: string;
-  profiles?: {
-    first_name: string | null;
-    last_name: string | null;
-  };
+  user_name?: string;
 }
 
 interface ReviewsSectionProps {
@@ -44,20 +41,32 @@ const ReviewsSection = ({ parkingSpaceId, averageRating, totalReviews }: Reviews
 
   const fetchReviews = async () => {
     try {
-      const { data, error } = await supabase
+      // First get reviews
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('parking_reviews')
-        .select(`
-          *,
-          profiles (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('parking_space_id', parkingSpaceId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setReviews(data || []);
+      if (reviewsError) throw reviewsError;
+
+      // Then get user names for each review
+      const reviewsWithNames = await Promise.all(
+        (reviewsData || []).map(async (review) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', review.user_id)
+            .maybeSingle();
+          
+          return {
+            ...review,
+            user_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Anonymous User'
+          };
+        })
+      );
+
+      setReviews(reviewsWithNames);
     } catch (error) {
       console.error('Error fetching reviews:', error);
     }
@@ -151,13 +160,6 @@ const ReviewsSection = ({ parkingSpaceId, averageRating, totalReviews }: Reviews
     );
   };
 
-  const getDisplayName = (review: Review) => {
-    if (review.profiles?.first_name || review.profiles?.last_name) {
-      return `${review.profiles.first_name || ""} ${review.profiles.last_name || ""}`.trim();
-    }
-    return "Anonymous User";
-  };
-
   return (
     <Card className="mt-4">
       <CardHeader>
@@ -237,7 +239,7 @@ const ReviewsSection = ({ parkingSpaceId, averageRating, totalReviews }: Reviews
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <User size={16} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">{getDisplayName(review)}</span>
+                    <span className="font-medium text-sm">{review.user_name || "Anonymous User"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {renderStars(review.rating)}
