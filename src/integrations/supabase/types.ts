@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       parking_reservations: {
         Row: {
           cancelled_at: string | null
@@ -77,12 +101,51 @@ export type Database = {
           },
         ]
       }
+      parking_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          parking_space_id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parking_space_id: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parking_space_id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parking_reviews_parking_space_id_fkey"
+            columns: ["parking_space_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parking_spaces: {
         Row: {
           accepts_cash_on_arrival: boolean | null
           additional_charges: string | null
           amenities: string[] | null
           available_spaces: number | null
+          average_rating: number | null
           capacity: number
           contact_email: string
           contact_phone: string
@@ -97,6 +160,7 @@ export type Database = {
           precise_location: string | null
           price_per_hour: number
           space_name: string
+          total_reviews: number | null
           updated_at: string
           user_id: string
           vehicle_counts: Json | null
@@ -107,6 +171,7 @@ export type Database = {
           additional_charges?: string | null
           amenities?: string[] | null
           available_spaces?: number | null
+          average_rating?: number | null
           capacity: number
           contact_email: string
           contact_phone: string
@@ -121,6 +186,7 @@ export type Database = {
           precise_location?: string | null
           price_per_hour: number
           space_name: string
+          total_reviews?: number | null
           updated_at?: string
           user_id: string
           vehicle_counts?: Json | null
@@ -131,6 +197,7 @@ export type Database = {
           additional_charges?: string | null
           amenities?: string[] | null
           available_spaces?: number | null
+          average_rating?: number | null
           capacity?: number
           contact_email?: string
           contact_phone?: string
@@ -145,6 +212,7 @@ export type Database = {
           precise_location?: string | null
           price_per_hour?: number
           space_name?: string
+          total_reviews?: number | null
           updated_at?: string
           user_id?: string
           vehicle_counts?: Json | null
