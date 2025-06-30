@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Car, Users, Truck, Bike, CreditCard, Banknote, Star } from "lucide-react";
+import { Car, Users, Truck, Bike, CreditCard, Banknote } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookingModal from "./BookingModal";
 import GlowingButton from "./GlowingButton";
+import PulsingIcon from "./PulsingIcon";
 
 interface ParkingSpace {
   id: string;
@@ -24,8 +25,6 @@ interface ParkingSpace {
   vehicle_types?: string[];
   vehicle_counts?: { [key: string]: number };
   accepts_cash_on_arrival?: boolean;
-  average_rating?: number;
-  total_reviews?: number;
 }
 
 interface EnhancedParkingSpaceCardProps {
@@ -64,20 +63,6 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
     }
   };
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={12}
-            className={star <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
-          />
-        ))}
-      </div>
-    );
-  };
-
   const availabilityStatus = getAvailabilityStatus();
   const hasVehicleTypes = space.vehicle_types && space.vehicle_types.length > 0;
   const hasVehicleCounts = space.vehicle_counts && Object.keys(space.vehicle_counts).length > 0;
@@ -104,16 +89,6 @@ const EnhancedParkingSpaceCard = ({ space, currentUserId }: EnhancedParkingSpace
               {availabilityStatus.text}
             </Badge>
           </div>
-          
-          {/* Rating display */}
-          {space.total_reviews && space.total_reviews > 0 && (
-            <div className="flex items-center gap-2 mt-2">
-              {renderStars(space.average_rating || 0)}
-              <span className="text-xs text-muted-foreground">
-                {(space.average_rating || 0).toFixed(1)} ({space.total_reviews} review{space.total_reviews !== 1 ? 's' : ''})
-              </span>
-            </div>
-          )}
           
           {space.image_urls && space.image_urls.length > 0 && (
             <div className="mt-3 overflow-hidden rounded-lg">

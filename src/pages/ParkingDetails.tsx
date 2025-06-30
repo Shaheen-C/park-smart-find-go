@@ -1,319 +1,398 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Phone, Mail, Car, Users, CreditCard, Banknote, Star, Map } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { ArrowLeft, MapPin, Phone, Mail, Car, Clock, Users, Truck, Bike } from "lucide-react";
+import BackButton from "@/components/BackButton";
+import ThemeToggle from "@/components/ThemeToggle";
 import BookingModal from "@/components/BookingModal";
-import ReviewsSection from "@/components/ReviewsSection";
-import MapPlaceholder from "@/components/MapPlaceholder";
+import { parkingService } from "@/services/parkingService";
+import { useToast } from "@/hooks/use-toast";
 
 interface ParkingSpace {
   id: string;
   space_name: string;
   location: string;
-  precise_location?: string;
   price_per_hour: number;
+  amenities: string[];
+  created_at: string;
   capacity: number;
   available_spaces: number;
   description: string;
-  amenities: string[];
-  vehicle_types: string[];
-  vehicle_counts: Record<string, any>;
   contact_phone: string;
   contact_email: string;
   image_urls: string[];
-  user_id: string;
-  accepts_cash_on_arrival: boolean;
-  average_rating: number;
-  total_reviews: number;
+  vehicle_types: string[];
+  vehicle_counts?: { [key: string]: number };
+  additional_charges?: string;
 }
 
 const ParkingDetails = () => {
-  const { id } = useParams();
-  const { user } = useAuth();
-  const [space, setSpace] = useState<ParkingSpace | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const [parkingSpace, setParkingSpace] = useState<ParkingSpace | null>(null);
   const [loading, setLoading] = useState(true);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (id) {
-      fetchParkingSpace();
+      loadParkingDetails(id);
     }
   }, [id]);
 
-  const fetchParkingSpace = async () => {
+  const loadParkingDetails = async (spaceId: string) => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('parking_spaces')
-        .select('*')
-        .eq('id', id)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching parking space:', error);
-        return;
-      }
-
-      if (data) {
-        // Convert vehicle_counts from Json to proper object
-        const processedData = {
-          ...data,
-          vehicle_counts: (data.vehicle_counts as any) || {}
-        };
-        setSpace(processedData);
+      const result = await parkingService.getParkingSpaceById(spaceId);
+      if (result.error) {
+        toast({
+          title: "Error loading parking details",
+          description: "Failed to fetch parking space details. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        setParkingSpace(result.data);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error loading parking details:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while loading parking details.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const formatPrice = (price: number) => {
+    return `₹${price}/hour`;
+  };
+
+  const getAvailabilityStatus = () => {
+    if (!parkingSpace) return { text: "Unknown", color: "text-gray-500" };
+    
+    const available = parkingSpace.available_spaces || 0;
+    if (available === 0) {
+      return { text: "Full", color: "text-red-500" };
+    } else if (available <= parkingSpace.capacity * 0.3) {
+      return { text: "Limited Availability", color: "text-orange-500" };
+    } else {
+      return { text: "Available", color: "text-green-500" };
+    }
+  };
+
+  const handleMapClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!parkingSpace) return;
+    
+    console.log('Map clicked for location:', parkingSpace.location);
+    
+    // Create Google Maps URL for directions
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(parkingSpace.location)}`;
+    console.log('Opening Google Maps URL:', googleMapsUrl);
+    
+    window.open(googleMapsUrl, '_blank');
+  };
+
+  const getVehicleIcon = (vehicleType: string) => {
+    const type = vehicleType.toLowerCase();
+    if (type.includes('car') || type.includes('sedan') || type.includes('suv')) {
+      return <Car className="h-4 w-4" />;
+    } else if (type.includes('truck') || type.includes('van')) {
+      return <Truck className="h-4 w-4" />;
+    } else if (type.includes('bike') || type.includes('motorcycle')) {
+      return <Bike className="h-4 w-4" />;
+    }
+    return <Car className="h-4 w-4" />;
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center py-8">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!space) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-4xl">
-          <Link to="/search" className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 mb-4">
-            <ArrowLeft size={20} />
-            Back to Search
-          </Link>
+      <div className="min-h-screen bg-background">
+        <header className="backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/20 shadow-lg border-b border-white/10 dark:border-white/10 light:border-black/10">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Link to="/" className="hover:opacity-80 transition-opacity">
+                  <img src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png" alt="Parkiko Logo" className="h-8 w-auto" />
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                <ThemeToggle />
+                <BackButton />
+              </div>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
           <div className="text-center py-8">
-            <h1 className="text-2xl font-bold mb-4">Parking Space Not Found</h1>
-            <p className="text-muted-foreground">This parking space may not exist or is no longer available.</p>
+            <p className="text-muted-foreground">Loading parking details...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  const isOwner = user?.id === space.user_id;
+  if (!parkingSpace) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/20 shadow-lg border-b border-white/10 dark:border-white/10 light:border-black/10">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Link to="/" className="hover:opacity-80 transition-opacity">
+                  <img src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png" alt="Parkiko Logo" className="h-8 w-auto" />
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                <ThemeToggle />
+                <BackButton />
+              </div>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Parking space not found.</p>
+            <Link to="/search">
+              <Button className="mt-4">Back to Search</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const handleMapClick = () => {
-    const encodedLocation = encodeURIComponent(`${space.location} ${space.precise_location || ''}`);
-    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
-  };
+  const availabilityStatus = getAvailabilityStatus();
+  const hasVehicleTypes = parkingSpace?.vehicle_types && parkingSpace.vehicle_types.length > 0;
+  const hasVehicleCounts = parkingSpace?.vehicle_counts && Object.keys(parkingSpace.vehicle_counts).length > 0;
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto max-w-6xl">
-        <Link to="/search" className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 mb-6">
-          <ArrowLeft size={20} />
-          Back to Search
-        </Link>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/20 shadow-lg border-b border-white/10 dark:border-white/10 light:border-black/10">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <img src="/lovable-uploads/ee3739b1-835b-43e5-bcd6-6e54bb7ee754.png" alt="Parkiko Logo" className="h-8 w-auto" />
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <BackButton />
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Details Card */}
-          <div className="lg:col-span-2">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link to="/search" className="inline-flex items-center text-green-500 hover:text-green-600 transition-colors">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Search
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Main Details */}
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-                  <div className="flex-1">
-                    <CardTitle className="text-2xl">{space.space_name}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-2">
-                      <MapPin size={16} />
-                      {space.location}
-                      {space.precise_location && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          • {space.precise_location}
-                        </span>
-                      )}
-                    </CardDescription>
-                    
-                    {/* Rating display */}
-                    {space.total_reviews > 0 && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              size={16}
-                              className={star <= Math.round(space.average_rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {space.average_rating.toFixed(1)} ({space.total_reviews} review{space.total_reviews !== 1 ? 's' : ''})
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-green-600">₹{space.price_per_hour}/hour</div>
-                    <Badge variant={space.available_spaces > 0 ? "default" : "destructive"} className="mt-2">
-                      {space.available_spaces > 0 ? `${space.available_spaces} Available` : "Full"}
-                    </Badge>
-                  </div>
-                </div>
+                <CardTitle className="text-2xl">{parkingSpace.space_name}</CardTitle>
+                <CardDescription className="flex items-center gap-2 text-lg">
+                  <MapPin className="h-5 w-5" />
+                  {parkingSpace.location}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Images */}
-                {space.image_urls && space.image_urls.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    {space.image_urls.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`${space.space_name} - Image ${index + 1}`}
-                        className="w-full h-48 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ))}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-3xl font-bold text-green-500">
+                    {formatPrice(parkingSpace.price_per_hour)}
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="h-5 w-5" />
+                      <span className="text-lg font-semibold">
+                        {parkingSpace.available_spaces || 0}/{parkingSpace.capacity}
+                      </span>
+                    </div>
+                    <div className={`text-sm font-medium ${availabilityStatus.color}`}>
+                      {availabilityStatus.text}
+                    </div>
+                  </div>
+                </div>
+                
+                <p className="text-muted-foreground mb-6">
+                  {parkingSpace.description}
+                </p>
+
+                {parkingSpace.additional_charges && (
+                  <div className="mb-4">
+                    <h4 className="font-semibold mb-2">Additional Charges:</h4>
+                    <p className="text-sm text-muted-foreground">{parkingSpace.additional_charges}</p>
                   </div>
                 )}
 
-                {/* Description */}
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-muted-foreground">{space.description}</p>
-                </div>
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={parkingSpace.available_spaces === 0}
+                  onClick={() => setBookingModalOpen(true)}
+                >
+                  {parkingSpace.available_spaces === 0 ? "Fully Booked" : "Book Now"}
+                </Button>
+              </CardContent>
+            </Card>
 
-                {/* Details Grid - Better aligned */}
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  {/* Capacity & Vehicle Types */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      <Car size={18} />
-                      Vehicle Information
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Total Capacity:</span>
-                        <span className="font-medium">{space.capacity} vehicles</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Available:</span>
-                        <span className="font-medium text-green-600">{space.available_spaces}</span>
-                      </div>
-                      {space.vehicle_types && space.vehicle_types.length > 0 && (
-                        <div className="border-t pt-3">
-                          <span className="text-sm font-medium mb-2 block">Vehicle Types Available:</span>
-                          <div className="space-y-2">
-                            {space.vehicle_types.map((type) => (
-                              <div key={type} className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">{type}:</span>
-                                <span className="font-medium">{space.vehicle_counts[type] || 0}</span>
-                              </div>
-                            ))}
+            {/* Vehicle Availability Details */}
+            {hasVehicleTypes && hasVehicleCounts && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    Available Spaces by Vehicle Type
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {parkingSpace.vehicle_types.map((vehicleType) => {
+                      const count = parkingSpace.vehicle_counts?.[vehicleType] || 0;
+                      return (
+                        <div key={vehicleType} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                          <div className="flex items-center gap-2">
+                            {getVehicleIcon(vehicleType)}
+                            <span className="font-medium">{vehicleType}</span>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Contact & Payment */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      <Users size={18} />
-                      Contact & Payment
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <Phone size={16} className="text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm">{space.contact_phone}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Mail size={16} className="text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm break-all">{space.contact_email}</span>
-                      </div>
-                      <div className="border-t pt-3">
-                        <span className="text-sm font-medium mb-2 block">Payment Methods:</span>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="outline" className="flex items-center gap-1">
-                            <CreditCard size={12} />
-                            Online Payment
+                          <Badge variant={count > 0 ? "default" : "secondary"} className={count > 0 ? "bg-green-600" : ""}>
+                            {count} available
                           </Badge>
-                          {space.accepts_cash_on_arrival && (
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <Banknote size={12} />
-                              Cash on Arrival
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Amenities */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Amenities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {parkingSpace.amenities?.map((amenity) => (
+                    <Badge key={amenity} variant="secondary" className="bg-green-900 text-green-300">
+                      {amenity}
+                    </Badge>
+                  ))}
+                  {(!parkingSpace.amenities || parkingSpace.amenities.length === 0) && (
+                    <p className="text-muted-foreground">No amenities listed</p>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Amenities */}
-                {space.amenities && space.amenities.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-3">Amenities</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {space.amenities.map((amenity) => (
-                        <Badge key={amenity} variant="secondary">
-                          {amenity}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Map Location Button */}
-                <div className="mb-6">
-                  <Button
-                    onClick={handleMapClick}
-                    variant="outline"
-                    className="w-full sm:w-auto flex items-center gap-2"
-                  >
-                    <Map size={16} />
-                    View on Map
-                  </Button>
+            {/* Vehicle Types */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Car className="h-5 w-5" />
+                  Accepted Vehicle Types
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {parkingSpace.vehicle_types?.map((type) => (
+                    <Badge key={type} variant="outline">
+                      {type}
+                    </Badge>
+                  ))}
+                  {(!parkingSpace.vehicle_types || parkingSpace.vehicle_types.length === 0) && (
+                    <p className="text-muted-foreground">All vehicle types accepted</p>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Book Now Button */}
-                {!isOwner && space.available_spaces > 0 && (
-                  <Button
-                    onClick={() => setBookingModalOpen(true)}
-                    size="lg"
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    Book This Space
-                  </Button>
-                )}
+            {/* Contact Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <span>{parkingSpace.contact_phone}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  <span>{parkingSpace.contact_email}</span>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Map Sidebar */}
-          <div className="lg:col-span-1">
-            <MapPlaceholder 
-              location={`${space.location} ${space.precise_location || ''}`}
-              onClick={handleMapClick}
-            />
+          {/* Images and Map */}
+          <div className="space-y-6">
+            {/* Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Photos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {parkingSpace.image_urls && parkingSpace.image_urls.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {parkingSpace.image_urls.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`${parkingSpace.space_name} - Photo ${index + 1}`}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-muted h-48 rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground">No photos available</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Map Placeholder */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div 
+                  className="bg-muted h-64 rounded-lg flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors border border-transparent hover:border-green-200"
+                  onClick={handleMapClick}
+                  title="Click to get directions"
+                  style={{ userSelect: 'none' }}
+                >
+                  <div className="text-center text-muted-foreground hover:text-green-600 transition-colors">
+                    <MapPin className="h-12 w-12 mx-auto mb-2 text-green-500" />
+                    <p className="text-foreground">Click for Directions</p>
+                    <p className="text-sm">Location: {parkingSpace.location}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        {/* Reviews Section */}
-        <div className="mt-6">
-          <ReviewsSection 
-            parkingSpaceId={space.id}
-            averageRating={space.average_rating || 0}
-            totalReviews={space.total_reviews || 0}
-          />
-        </div>
-
-        <BookingModal
-          open={bookingModalOpen}
-          onOpenChange={setBookingModalOpen}
-          parkingSpace={space}
-        />
       </div>
+
+      <BookingModal
+        open={bookingModalOpen}
+        onOpenChange={setBookingModalOpen}
+        parkingSpace={parkingSpace}
+      />
     </div>
   );
 };

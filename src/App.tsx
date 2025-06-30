@@ -1,56 +1,58 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/hooks/useTheme";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
+import SignInModal from "@/components/SignInModal";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
-import ParkingDetails from "./pages/ParkingDetails";
 import ListSpace from "./pages/ListSpace";
-import ManageListings from "./pages/ManageListings";
-import MyReservations from "./pages/MyReservations";
+import ParkingDetails from "./pages/ParkingDetails";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
-import Admin from "./pages/Admin";
+import ManageListings from "./pages/ManageListings";
+import MyReservations from "./pages/MyReservations";
+import NearbyFacilitiesPage from "./pages/NearbyFacilities";
+import FastagRecharge from "./pages/FastagRecharge";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
-import NearbyFacilities from "./pages/NearbyFacilities";
-import FastagRecharge from "./pages/FastagRecharge";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <Router>
-            <div className="min-h-screen bg-background">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/parking/:id" element={<ParkingDetails />} />
-                <Route path="/list-space" element={<ListSpace />} />
-                <Route path="/manage-listings" element={<ManageListings />} />
-                <Route path="/my-reservations" element={<MyReservations />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/how-it-works" element={<HowItWorks />} />
-                <Route path="/nearby-facilities" element={<NearbyFacilities />} />
-                <Route path="/fastag-recharge" element={<FastagRecharge />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
-            </div>
-          </Router>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <SignInModal />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/list-space" element={<ListSpace />} />
+              <Route path="/manage-listings" element={<ManageListings />} />
+              <Route path="/my-reservations" element={<MyReservations />} />
+              <Route path="/nearby-facilities" element={<NearbyFacilitiesPage />} />
+              <Route path="/fastag-recharge" element={<FastagRecharge />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/parking/:id" element={<ParkingDetails />} />
+              <Route path="/login" element={<SignIn />} />
+              <Route path="/register" element={<Register />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
+);
 
 export default App;

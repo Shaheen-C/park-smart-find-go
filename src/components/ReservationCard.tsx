@@ -57,20 +57,10 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
     }
   };
 
+  const canCancel = reservation.reservation_status === 'confirmed' || reservation.reservation_status === 'pending';
+  const canDelete = reservation.reservation_status === 'cancelled';
   const arrivalDate = new Date(reservation.estimated_arrival_time);
   const isUpcoming = arrivalDate > new Date();
-  const canCancel = (reservation.reservation_status === 'confirmed' || reservation.reservation_status === 'pending') && isUpcoming;
-  const canDelete = reservation.reservation_status === 'cancelled';
-
-  // Debug logging
-  console.log('Reservation debug:', {
-    id: reservation.id,
-    status: reservation.reservation_status,
-    arrivalDate: arrivalDate.toISOString(),
-    isUpcoming,
-    canCancel,
-    canDelete
-  });
 
   return (
     <Card className={reservation.reservation_status === 'cancelled' ? "opacity-60" : ""}>
@@ -94,8 +84,7 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            {/* Always show cancel button for confirmed/pending reservations (remove upcoming restriction for testing) */}
-            {(reservation.reservation_status === 'confirmed' || reservation.reservation_status === 'pending') && (
+            {canCancel && isUpcoming && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -214,11 +203,6 @@ const ReservationCard = ({ reservation, onCancel, onDelete, actionLoading }: Res
             </p>
           </div>
         )}
-
-        {/* Debug info - remove this after testing */}
-        <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-600">
-          Debug: Status={reservation.reservation_status}, Upcoming={isUpcoming ? 'Yes' : 'No'}, CanCancel={canCancel ? 'Yes' : 'No'}
-        </div>
       </CardContent>
     </Card>
   );
