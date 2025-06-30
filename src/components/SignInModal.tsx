@@ -30,6 +30,8 @@ const SignInModal = () => {
 
       if (error) {
         toast.error(error.message);
+      } else {
+        toast.success("Redirecting to Google...");
       }
     } catch (error) {
       console.error("Google sign in error:", error);
@@ -41,6 +43,11 @@ const SignInModal = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
     setIsLoading(true);
     
     const result = await authService.signIn({
@@ -53,6 +60,7 @@ const SignInModal = () => {
       setShowSignInModal(false);
       setEmail("");
       setPassword("");
+      toast.success("Successfully signed in!");
     }
   };
 
